@@ -9,9 +9,12 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
-import { useSidebar, SidebarProvider } from "./ui/sidebar";
+
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
+import Link from "next/link";
+import { useSidebar } from "../ui/sidebar";
 
 const TopbarContent = () => {
   const { setOpen } = useSidebar();
@@ -24,7 +27,7 @@ const TopbarContent = () => {
     });
   };
 
-  const breadcrumbs = getBreadcrumbs();
+  const breadcrumbs = useBreadcrumbs();
 
   return (
     <>
@@ -94,7 +97,13 @@ const TopbarContent = () => {
                 {index > 0 && (
                   <ChevronRight className='h-3 w-3 sm:h-4 sm:w-4' />
                 )}
-                <span>{crumb}</span>
+                {index === breadcrumbs.length - 1 ? (
+                  <span>{crumb.label}</span>
+                ) : (
+                  <Link href={crumb.href} className='hover:underline'>
+                    {crumb.label}
+                  </Link>
+                )}
               </React.Fragment>
             ))}
           </div>

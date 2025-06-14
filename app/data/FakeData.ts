@@ -7,10 +7,10 @@ export class FakeData {
               name: "Object-Oriented Programming and Data Structures",
               instructor: "Dr. Sarah Johnson",
               credits: 4,
-              schedule: "Section 1 (6h45 - 7h30) Thursday",
+              section: 1,
+              schedule: "Thursday",
               location: "C001",
               enrolled: 245,
-              capacity: 280,
               rating: 4.8,
               description:
                 "Introduction to object-oriented programming with Java and fundamental data structures.",
@@ -23,10 +23,10 @@ export class FakeData {
               name: "Swimming for Beginners",
               instructor: "Coach Mike Wilson",
               credits: 1,
-              schedule: "Section 1 (6h45 - 7h30) Thursday",
+              section: 1,
+              schedule: "Thursday",
               location: "TDTU Pool",
               enrolled: 18,
-              capacity: 25,
               rating: 4.9,
               description:
                 "Learn basic swimming techniques and water safety in a supportive environment.",
@@ -39,28 +39,26 @@ export class FakeData {
               name: "Introduction to Philosophy",
               instructor: "Prof. Emily Chen",
               credits: 3,
-              schedule: "Section 1 (6h45 - 7h30) Thursday",
+              section: 1,
+              schedule: "Thursday",
               location: "D304",
               enrolled: 89,
-              capacity: 120,
               rating: 4.6,
               description:
                 "Explore fundamental questions about existence, knowledge, and ethics through classic texts.",
               type: "philosophy",
               semester: "HK1 2023-2024",
             },
-
-
             {
               id: 4,
               code: "CS 3410",
               name: "Computer System Organization and Programming",
               instructor: "Dr. Michael Brown",
               credits: 4,
-              schedule: "Section 1 (8h00 - 9h30) Monday & Wednesday",
+              section: 1,
+              schedule: "Monday & Wednesday",
               location: "B205",
               enrolled: 167,
-              capacity: 200,
               rating: 4.5,
               description:
                 "Computer organization, instruction sets, assembly language, and system-level programming.",
@@ -73,10 +71,10 @@ export class FakeData {
               name: "Linear Algebra for Engineers",
               instructor: "Prof. Lisa Anderson",
               credits: 4,
-              schedule: "Section 2 (10h00 - 11h30) Tuesday & Friday",
+              section: 1,
+              schedule: "Tuesday & Friday",
               location: "A301",
               enrolled: 134,
-              capacity: 180,
               rating: 4.3,
               description:
                 "Vector spaces, linear transformations, eigenvalues, and applications to engineering.",
@@ -89,10 +87,10 @@ export class FakeData {
               name: "Basketball Fundamentals",
               instructor: "Coach David Rodriguez",
               credits: 1,
-              schedule: "Section 1 (14h00 - 15h30) Tuesday",
+              section: 1,
+              schedule: "Tuesday",
               location: "Main Gym",
               enrolled: 22,
-              capacity: 30,
               rating: 4.7,
               description:
                 "Learn basketball basics including shooting, dribbling, passing, and game strategy.",
@@ -105,10 +103,10 @@ export class FakeData {
               name: "Yoga and Mindfulness",
               instructor: "Instructor Maria Santos",
               credits: 1,
-              schedule: "Section 1 (16h00 - 17h00) Thursday",
+              section: 1,
+              schedule: "Thursday",
               location: "Studio A",
               enrolled: 15,
-              capacity: 20,
               rating: 4.9,
               description:
                 "Practice yoga poses, breathing techniques, and mindfulness meditation for wellness.",
@@ -121,10 +119,10 @@ export class FakeData {
               name: "Ethics and Moral Philosophy",
               instructor: "Dr. James Thompson",
               credits: 3,
-              schedule: "Section 1 (9h00 - 10h30) Monday & Wednesday",
+              section: 1,
+              schedule: "Monday & Wednesday",
               location: "C203",
               enrolled: 76,
-              capacity: 100,
               rating: 4.4,
               description:
                 "Examination of major ethical theories and their applications to contemporary moral issues.",
@@ -137,10 +135,10 @@ export class FakeData {
               name: "Philosophy of Mind",
               instructor: "Prof. Rachel Green",
               credits: 3,
-              schedule: "Section 1 (13h00 - 14h30) Tuesday & Thursday",
+              section: 1,
+              schedule: "Tuesday & Thursday",
               location: "D201",
               enrolled: 45,
-              capacity: 60,
               rating: 4.6,
               description:
                 "Explore consciousness, personal identity, and the mind-body problem in philosophy.",
@@ -153,10 +151,10 @@ export class FakeData {
               name: "Academic Writing and Research",
               instructor: "Prof. Jennifer Lee",
               credits: 3,
-              schedule: "Section 1 (8h00 - 9h30) Tuesday & Thursday",
+              section: 1,
+              schedule: "Tuesday & Thursday",
               location: "E102",
               enrolled: 98,
-              capacity: 120,
               rating: 4.2,
               description:
                 "Develop academic writing skills, research methods, and critical thinking through essays.",
@@ -169,10 +167,10 @@ export class FakeData {
               name: "American Literature Survey",
               instructor: "Dr. Robert Kim",
               credits: 3,
-              schedule: "Section 1 (10h00 - 11h30) Monday & Wednesday",
+              section: 1,
+              schedule: "Monday & Wednesday",
               location: "E205",
               enrolled: 67,
-              capacity: 80,
               rating: 4.5,
               description:
                 "Survey of American literature from colonial times to the present, including major authors and movements.",
@@ -185,10 +183,10 @@ export class FakeData {
               name: "Creative Writing Workshop",
               instructor: "Prof. Amanda White",
               credits: 3,
-              schedule: "Section 1 (15h00 - 17h30) Wednesday",
+              section: 1,
+              schedule: "Wednesday",
               location: "E108",
               enrolled: 18,
-              capacity: 25,
               rating: 4.8,
               description:
                 "Workshop-based course focusing on developing original fiction and poetry writing skills.",
@@ -197,4 +195,24 @@ export class FakeData {
       },
     ];
   }
+
+
+  static getCourseSchedule() {
+    return [
+      {
+        id: 1,
+        courseId: 1,
+        section: 1,
+        date: "14/06/2025",
+      },
+      {
+        id: 2,
+        courseId: 2,
+        section: 1,
+        date: "14/06/2025",
+      },
+    ];
+  }
+
+
 }

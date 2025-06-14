@@ -4,6 +4,7 @@ interface Course {
     name: string;
     instructor: string;
     credits: number;
+    section: number;
     schedule: string;
     location: string;
     enrolled: number;

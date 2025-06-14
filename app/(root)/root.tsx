@@ -2,9 +2,9 @@
 
 import React from "react";
 import { usePathname } from "next/navigation";
-import { AppSidebar } from "@/components/app_sidebar";
-import AppTopbar from "@/components/app_topbar";
-import { SidebarProvider } from "@/components/ui/sidebar"; // <-- import SidebarProvider here
+import { AppSidebar } from "@/components/bar/app_sidebar";
+import AppTopbar from "@/components/bar/app_topbar";
+import { SidebarProvider } from "@/components/ui/sidebar";
 
 interface RootProps {
   children: React.ReactNode;
