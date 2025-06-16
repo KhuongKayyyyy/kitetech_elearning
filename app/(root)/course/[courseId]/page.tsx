@@ -5,16 +5,19 @@ import CourseBriefInformation from "./CourseBriefInformation";
 import { ArrowRight, BookOpen } from "lucide-react";
 import AddSectionButton from "./AddSectionButton";
 import ClassSectionList from "@/components/item_list/ClassSectionList";
+
 interface CoursePageProps {
-  params: {
+  params: Promise<{
     courseId: string;
-  };
+  }>;
 }
 
-export default function page({ params }: CoursePageProps) {
+export default function Page({ params }: CoursePageProps) {
+  const actualParams = React.use(params);
+
   // fake data
   const course = FakeData.getCourses().find(
-    (c) => c.id === parseInt(params.courseId)
+    (c) => c.id === parseInt(actualParams.courseId)
   );
 
   if (!course) {

@@ -43,6 +43,24 @@ export function AppSidebar() {
 
   const { open, setOpen } = useSidebar();
 
+  const isActiveLink = (link: { href: string }) => {
+    if (link.href === "/course") {
+      return pathname.startsWith("/course");
+    }
+    if (link.href === "/profile") {
+      return pathname.startsWith("/profile");
+    }
+    if (link.href === "/settings") {
+      return (
+        pathname.startsWith("/settings") || pathname.startsWith("/setting")
+      );
+    }
+    if (link.href === "/logout") {
+      return pathname.startsWith("/logout");
+    }
+    return pathname === link.href;
+  };
+
   return (
     <div className='h-screen'>
       <Sidebar open={open} setOpen={setOpen} animate={true}>
@@ -54,7 +72,7 @@ export function AppSidebar() {
                 <SidebarLink
                   key={idx}
                   link={link}
-                  isActive={pathname === link.href}
+                  isActive={isActiveLink(link)}
                 />
               ))}
             </div>

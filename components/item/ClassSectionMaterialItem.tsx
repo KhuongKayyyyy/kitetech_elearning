@@ -87,8 +87,7 @@ export default function ClassSectionMaterialItem({
     <div
       className={`mx-2 sm:mx-5 group bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 sm:p-4 hover:border-black hover:border-3 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 ${
         material.type === "link" ? "cursor-pointer" : ""
-      }`}
-      onClick={material.type === "link" ? handleItemClick : undefined}>
+      }`}>
       <div className='flex items-start sm:items-center gap-2 sm:gap-3'>
         <div className='flex-shrink-0 mt-0.5 sm:mt-0'>
           {getIconForType(material.type)}
