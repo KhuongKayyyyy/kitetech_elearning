@@ -10,17 +10,24 @@ interface BreadcrumbItem {
   href: string;
 }
 
-async function getCourseById(id: string) {
-  const courses = FakeData.getCourses();
-  const course = courses.find((item) => String(item.id) === id);
-  return course ?? null;
-}
-
-async function resolveBreadcrumbName(segment: string, id: string) {
+// Async resolvers for known segments
+async function resolveBreadcrumb(segment: string, id: string): Promise<string> {
   switch (segment) {
-    case "course":
-      const course = await getCourseById(id);
+    case "course": {
+      const courses = FakeData.getCourses();
+      const course = courses.find((item) => String(item.id) === id);
       return course?.name ?? id;
+    }
+    case "lesson": {
+      const lessons = FakeData.getClassSections();
+      const lesson = lessons.find((item) => String(item.id) === id);
+      return lesson?.name ?? id;
+    }
+    case "content": {
+      const materials = FakeData.getClassSectionMaterial();
+      const material = materials.find((item) => String(item.id) === id);
+      return material?.material ?? id;
+    }
     default:
       return id;
   }
@@ -41,12 +48,15 @@ export function useBreadcrumbs(): BreadcrumbItem[] {
         const segment = paths[i];
         const nextSegment = paths[i + 1];
 
-        if (["course"].includes(segment) && nextSegment) {
+        if (nextSegment && await hasResolver(segment)) {
           hrefAccumulator += `/${segment}`;
-          result.push({ label: capitalize(segment), href: hrefAccumulator });
+          // Only push for 'course', skip for 'lesson' and 'content'
+          if (segment !== "lesson" && segment !== "content") {
+            result.push({ label: capitalize(segment), href: hrefAccumulator });
+          }
 
           hrefAccumulator += `/${nextSegment}`;
-          const name = await resolveBreadcrumbName(segment, nextSegment);
+          const name = await resolveBreadcrumb(segment, nextSegment);
           result.push({ label: name, href: hrefAccumulator });
 
           i++; // skip id
@@ -67,4 +77,8 @@ export function useBreadcrumbs(): BreadcrumbItem[] {
 
 function capitalize(text: string) {
   return text.charAt(0).toUpperCase() + text.slice(1);
+}
+
+async function hasResolver(segment: string) {
+  return ["course", "lesson", "content"].includes(segment);
 }
