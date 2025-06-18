@@ -8,6 +8,7 @@ import {
   Upload,
   ChevronDown,
   ChevronUp,
+  Check,
 } from "lucide-react";
 import markdownit from "markdown-it";
 import DOMPurify from "isomorphic-dompurify";
@@ -43,10 +44,13 @@ export default function ClassSectionMaterialItem({
   isExpanded: propIsExpanded,
 }: ClassSectionMaterialItemProps) {
   const [internalIsExpanded, setInternalIsExpanded] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
   const isExpanded =
     propIsExpanded !== undefined ? propIsExpanded : internalIsExpanded;
   const router = useRouter();
   const courseId = FakeData.getCourses()[0].id;
+  const currentUserRole = FakeData.getCurrentUserRole();
+
   const handleTitleClick = () => {
     // Handle navigation to detail page
     router.push(
@@ -75,6 +79,11 @@ export default function ClassSectionMaterialItem({
     }
   };
 
+  const handleCheckboxChange = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsCompleted(!isCompleted);
+  };
+
   const isMarkdownType =
     material.type === "announcement" || material.type === "submission";
 
@@ -89,6 +98,19 @@ export default function ClassSectionMaterialItem({
         material.type === "link" ? "cursor-pointer" : ""
       }`}>
       <div className='flex items-start sm:items-center gap-2 sm:gap-3'>
+        {currentUserRole === "student" && (
+          <div className='flex-shrink-0 mt-0.5 sm:mt-0'>
+            <button
+              onClick={handleCheckboxChange}
+              className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                isCompleted
+                  ? "bg-primary border-primary text-white"
+                  : "border-neutral-300 dark:border-neutral-600 hover:border-primary"
+              }`}>
+              {isCompleted && <Check className='h-3 w-3' />}
+            </button>
+          </div>
+        )}
         <div className='flex-shrink-0 mt-0.5 sm:mt-0'>
           {getIconForType(material.type)}
         </div>

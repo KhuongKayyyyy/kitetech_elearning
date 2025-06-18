@@ -24,7 +24,7 @@ export default function Home() {
   }, [course, selectedSemester, selectedType]);
 
   return (
-    <div className='flex flex-col lg:flex-row w-full'>
+    <div className='flex flex-col xl:flex-row w-full'>
       <div className='flex-1 p-4 max-w-full'>
         <div className='flex flex-col gap-4'>
           <div className='flex items-center justify-between'>
@@ -36,14 +36,14 @@ export default function Home() {
             selectedType={selectedType}
             setSelectedType={setSelectedType}
           />
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3 gap-4'>
             {filteredCourses.map((courseItem) => (
               <CourseItem key={courseItem.id} course={courseItem} />
             ))}
           </div>
         </div>
       </div>
-      <div className='w-full lg:w-110 border-t lg:border-t-0 lg:border-l border-neutral-200 dark:border-neutral-700'>
+      <div className='w-full xl:w-110 border-t xl:border-t-0 xl:border-l border-neutral-200 dark:border-neutral-700'>
         <CourseSidebar />
       </div>
     </div>

@@ -215,7 +215,7 @@ export class FakeData {
   }
 
   static getCurrentUserRole() {
-    return "teacher";
+    return "student";
   }
 
   static getClassSections() {
@@ -244,8 +244,6 @@ export class FakeData {
         section: 4,
         name: "Section 4",
       },
-      
-      
     ];
   }
 
@@ -332,6 +330,21 @@ export class FakeData {
       {
         id: 4,
         classSectionId: 1,
+        material: "Announcement",
+        type: "announcement",
+        content: `# Fable - Manga Reading App `
+      },
+
+      {
+        id: 5,
+        classSectionId: 2,
+        material: "Announcement",
+        type: "announcement",
+        content: `# Fable - Manga Reading App `
+      },
+      {
+        id: 6,
+        classSectionId: 2,
         material: "Announcement",
         type: "announcement",
         content: `# Fable - Manga Reading App `

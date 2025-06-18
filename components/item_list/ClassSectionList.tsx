@@ -1,9 +1,12 @@
 import React from "react";
-import { FakeData } from "@/app/data/FakeData";
 import ClassSectionItem from "../item/ClassSectionItem";
+interface ClassSectionListProps {
+  classSections: Array<ClassSectionModel>;
+}
 
-export default function ClassSectionList() {
-  const classSections = FakeData.getClassSections();
+export default function ClassSectionList({
+  classSections,
+}: ClassSectionListProps) {
   return (
     <div className='flex flex-col gap-4'>
       {classSections.map((classSection) => (
