@@ -7,7 +7,13 @@ import {
   SidebarLink,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { LayoutDashboard, UserCog, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  UserCog,
+  Settings,
+  LogOut,
+  Calendar,
+} from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
@@ -25,9 +31,9 @@ export function AppSidebar() {
       icon: <LayoutDashboard className='h-5 w-5 flex-shrink-0' />,
     },
     {
-      label: "Profile",
-      href: "/profile",
-      icon: <UserCog className='h-5 w-5 flex-shrink-0' />,
+      label: "Calendar",
+      href: "/calendar",
+      icon: <Calendar className='h-5 w-5 flex-shrink-0' />,
     },
     {
       label: "Settings",

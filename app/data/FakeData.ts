@@ -203,13 +203,13 @@ export class FakeData {
         id: 1,
         courseId: 1,
         section: 1,
-        date: "14/06/2025",
+        date: "18/06/2025",
       },
       {
         id: 2,
         courseId: 2,
         section: 1,
-        date: "14/06/2025",
+        date: "18/06/2025",
       },
     ];
   }
