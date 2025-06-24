@@ -215,7 +215,7 @@ export class FakeData {
   }
 
   static getCurrentUserRole() {
-    return "student";
+    return "teacher";
   }
 
   static getClassSections() {

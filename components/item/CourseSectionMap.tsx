@@ -1,21 +1,17 @@
 import React from "react";
-import { FakeData } from "@/app/data/FakeData";
 import { useRouter } from "next/navigation";
 
 interface CourseSectionMapProps {
-  currentCourseId?: number;
-  currentSectionId?: number;
+  currentSectionId: number;
+  classSession: ClassSectionModel[];
 }
 
 export default function CourseSectionMap({
-  currentCourseId = 1,
-  currentSectionId,
+  classSession,
 }: CourseSectionMapProps) {
   const router = useRouter();
-  const classSections = FakeData.getClassSections();
 
   const handleSectionClick = (sectionId: number) => {
-    // Scroll to the section element on the page
     const sectionElement = document.getElementById(`section-${sectionId}`);
     if (sectionElement) {
       sectionElement.scrollIntoView({
@@ -31,17 +27,13 @@ export default function CourseSectionMap({
         Course Sections
       </h3>
       <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3'>
-        {classSections.map((section) => (
+        {classSession.map((section) => (
           <button
             key={section.id}
             onClick={() => handleSectionClick(section.id)}
             className={`
               relative p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 text-center min-h-[60px] sm:min-h-[70px]
-              ${
-                currentSectionId === section.id
-                  ? "border-primary bg-primary/10 text-primary"
-                  : "border-neutral-200 dark:border-neutral-600 hover:border-primary hover:bg-primary/5"
-              }
+              border-neutral-200 dark:border-neutral-600 hover:border-primary hover:bg-primary/5
               hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1
             `}>
             <div className='text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1'>
@@ -53,9 +45,6 @@ export default function CourseSectionMap({
             <div className='text-xs text-neutral-500 dark:text-neutral-400 truncate px-1'>
               {section.name}
             </div>
-            {currentSectionId === section.id && (
-              <div className='absolute -top-1 -right-1 w-2 h-2 sm:w-3 sm:h-3 bg-primary rounded-full'></div>
-            )}
           </button>
         ))}
       </div>

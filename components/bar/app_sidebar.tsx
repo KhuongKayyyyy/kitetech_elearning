@@ -13,6 +13,7 @@ import {
   Settings,
   LogOut,
   Calendar,
+  BookOpen,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -36,9 +37,9 @@ export function AppSidebar() {
       icon: <Calendar className='h-5 w-5 flex-shrink-0' />,
     },
     {
-      label: "Settings",
-      href: "/settings",
-      icon: <Settings className='h-5 w-5 flex-shrink-0' />,
+      label: "Assignment",
+      href: "/assignment",
+      icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
     },
     {
       label: "Logout",

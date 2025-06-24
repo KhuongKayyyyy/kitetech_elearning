@@ -9,11 +9,15 @@ import {
   Check,
   X,
   Trash2,
+  Link,
 } from "lucide-react";
 import { FakeData } from "@/app/data/FakeData";
 import ClassSectionMaterialItem from "./ClassSectionMaterialItem";
 import { useRouter } from "next/navigation";
 import ClassSectionMaterialRearrangableList from "../item_list/ClassSectionMaterialRearrangableList";
+import { Button } from "../ui/button";
+import AddMaterialItem from "../ui/AddMaterialItem";
+import { toast, Toaster } from "sonner";
 
 interface ClassSectionItemProps {
   classSection: ClassSectionModel;
@@ -24,14 +28,17 @@ export default function ClassSectionItem({
   classSection,
   onDeleteSection,
 }: ClassSectionItemProps) {
-  const classSectionMaterials = FakeData.getClassSectionMaterial().filter(
-    (material) => material.classSectionId === classSection.id
+  const [classSectionMaterials, setClassSectionMaterials] = useState(
+    FakeData.getClassSectionMaterial().filter(
+      (material) => material.classSectionId === classSection.id
+    )
   );
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedName, setEditedName] = useState(classSection.name);
   const [isEditingName, setIsEditingName] = useState(false);
-
+  const [isAddDocumentMaterialOpen, setIsAddDocumentMaterialOpen] =
+    useState(false);
   // Add scroll effect for section jumping
   useEffect(() => {
     const handleHashChange = () => {
@@ -78,6 +85,77 @@ export default function ClassSectionItem({
     if (onDeleteSection) {
       onDeleteSection(classSection.id);
     }
+  };
+
+  const handleAddDocumentMaterial = (materialData: {
+    title: string;
+    description?: string;
+    file?: File;
+    link?: string;
+    deadline?: string;
+    type: "document" | "announcement" | "submission" | "link";
+  }) => {
+    // Handle empty array case for ID generation
+    const currentIds = classSectionMaterials.map((m) => m.id);
+    const maxId = currentIds.length > 0 ? Math.max(...currentIds) : 0;
+
+    // Create new material with unique ID
+    const newMaterial = {
+      id: maxId + 1,
+      classSectionId: classSection.id,
+      material: materialData.title,
+      type: materialData.type,
+      content: materialData.description || "",
+      link: materialData.link,
+      deadline: materialData.deadline,
+    };
+
+    // Update the materials state
+    setClassSectionMaterials((prev) => {
+      const updated = [...prev, newMaterial];
+      console.log("Updated materials array:", updated);
+      return updated;
+    });
+
+    // Print out detailed information of new material added
+    console.log("=== New Material Added ===");
+    console.log("Title:", materialData.title);
+    console.log("Description:", materialData.description);
+    console.log("Type:", materialData.type);
+
+    if (materialData.link) {
+      console.log("Link:", materialData.link);
+    }
+
+    if (materialData.deadline) {
+      console.log("Deadline:", materialData.deadline);
+    }
+
+    if (materialData.file) {
+      console.log("File Information:");
+      console.log("  - Name:", materialData.file.name);
+      console.log("  - Size:", materialData.file.size, "bytes");
+      console.log("  - Type:", materialData.file.type);
+      console.log(
+        "  - Last Modified:",
+        new Date(materialData.file.lastModified).toISOString()
+      );
+    } else {
+      console.log("No file attached");
+    }
+
+    console.log("Added at:", new Date().toISOString());
+    console.log("Section ID:", classSection.id);
+    console.log("Section Name:", classSection.name);
+    console.log("New Material ID:", newMaterial.id);
+    console.log("Current materials count:", classSectionMaterials.length);
+    console.log("========================");
+
+    // Show success toast
+    toast.success("Material added successfully");
+
+    // Close the modal
+    setIsAddDocumentMaterialOpen(false);
   };
 
   return (
@@ -177,7 +255,6 @@ export default function ClassSectionItem({
           )}
         </div>
       </div>
-
       {/* Materials Section */}
       {isEditMode ? (
         <ClassSectionMaterialRearrangableList
@@ -205,15 +282,13 @@ export default function ClassSectionItem({
           </div>
         </div>
       )}
-
       {/* Add Material Button for Teachers */}
       {FakeData.getCurrentUserRole() === "teacher" && !isEditMode && (
         <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
           <button
             onClick={(e) => {
               e.stopPropagation();
-              // TODO: Implement add material functionality
-              console.log("Add material clicked");
+              setIsAddDocumentMaterialOpen(true);
             }}
             className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
             <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
@@ -221,6 +296,22 @@ export default function ClassSectionItem({
           </button>
         </div>
       )}
+      {/* add dialog */}
+      <AddMaterialItem
+        open={isAddDocumentMaterialOpen}
+        onOpenChange={setIsAddDocumentMaterialOpen}
+        onSave={(materialData) => {
+          if (materialData.description && materialData.type) {
+            handleAddDocumentMaterial({
+              title: materialData.title,
+              description: materialData.description,
+              file: materialData.file,
+              type: materialData.type,
+            });
+          }
+        }}
+      />
+      <Toaster></Toaster>
     </div>
   );
 }
