@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,8 +24,10 @@ import {
   Calendar,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 interface AddDocumentMaterialProps {
+  type?: ClassAssignmentEnum;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (materialData: {
@@ -34,11 +36,12 @@ interface AddDocumentMaterialProps {
     file?: File;
     link?: string;
     deadline?: string;
-    type: "document" | "announcement" | "submission" | "link";
+    type: ClassAssignmentEnum;
   }) => void;
 }
 
 export default function AddMaterialItem({
+  type,
   open,
   onOpenChange,
   onSave,
@@ -48,10 +51,17 @@ export default function AddMaterialItem({
   const [link, setLink] = useState("");
   const [deadline, setDeadline] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [materialType, setMaterialType] = useState<
-    "document" | "announcement" | "submission" | "link"
-  >("document");
+  const [materialType, setMaterialType] = useState<ClassAssignmentEnum>(
+    ClassAssignmentEnum.DOCUMENT
+  );
   const [dragActive, setDragActive] = useState(false);
+
+  // Auto-select the type if provided as prop
+  useEffect(() => {
+    if (type) {
+      setMaterialType(type);
+    }
+  }, [type]);
 
   const handleFileSelect = (file: File) => {
     setSelectedFile(file);
@@ -101,15 +111,17 @@ export default function AddMaterialItem({
 
   const handleSave = () => {
     if (!title.trim()) return;
-    if (materialType === "link" && !link.trim()) return;
+    if (materialType === ClassAssignmentEnum.LINK && !link.trim()) return;
 
     onSave({
       title: title.trim(),
       description: description.trim() || undefined,
       file: selectedFile || undefined,
-      link: materialType === "link" ? link.trim() : undefined,
+      link: materialType === ClassAssignmentEnum.LINK ? link.trim() : undefined,
       deadline:
-        materialType === "submission" && deadline ? deadline : undefined,
+        materialType === ClassAssignmentEnum.SUBMISSION && deadline
+          ? deadline
+          : undefined,
       type: materialType,
     });
 
@@ -119,7 +131,7 @@ export default function AddMaterialItem({
     setLink("");
     setDeadline("");
     setSelectedFile(null);
-    setMaterialType("document");
+    setMaterialType(type || ClassAssignmentEnum.DOCUMENT);
     onOpenChange(false);
   };
 
@@ -129,7 +141,7 @@ export default function AddMaterialItem({
     setLink("");
     setDeadline("");
     setSelectedFile(null);
-    setMaterialType("document");
+    setMaterialType(type || ClassAssignmentEnum.DOCUMENT);
     onOpenChange(false);
   };
 
@@ -149,49 +161,69 @@ export default function AddMaterialItem({
 
         <div className='grid gap-6 py-4'>
           {/* Material Type Selection */}
-          <div className='space-y-3'>
-            <Label className='text-sm font-medium'>Material Type</Label>
-            <div className='grid grid-cols-2 gap-2'>
-              <Button
-                type='button'
-                variant={materialType === "document" ? "default" : "outline"}
-                size='sm'
-                onClick={() => setMaterialType("document")}
-                className='justify-start'>
-                <FileText className='h-4 w-4 mr-2' />
-                Document
-              </Button>
-              <Button
-                type='button'
-                variant={
-                  materialType === "announcement" ? "default" : "outline"
-                }
-                size='sm'
-                onClick={() => setMaterialType("announcement")}
-                className='justify-start'>
-                <FileText className='h-4 w-4 mr-2' />
-                Announcement
-              </Button>
-              <Button
-                type='button'
-                variant={materialType === "submission" ? "default" : "outline"}
-                size='sm'
-                onClick={() => setMaterialType("submission")}
-                className='justify-start'>
-                <BookOpen className='h-4 w-4 mr-2' />
-                Assignment
-              </Button>
-              <Button
-                type='button'
-                variant={materialType === "link" ? "default" : "outline"}
-                size='sm'
-                onClick={() => setMaterialType("link")}
-                className='justify-start'>
-                <Link className='h-4 w-4 mr-2' />
-                Link
-              </Button>
+          {!type && (
+            <div className='space-y-3'>
+              <Label className='text-sm font-medium'>Material Type</Label>
+              <div className='grid grid-cols-2 gap-2'>
+                <Button
+                  type='button'
+                  variant={
+                    materialType === ClassAssignmentEnum.DOCUMENT
+                      ? "default"
+                      : "outline"
+                  }
+                  size='sm'
+                  onClick={() => setMaterialType(ClassAssignmentEnum.DOCUMENT)}
+                  className='justify-start'>
+                  <FileText className='h-4 w-4 mr-2' />
+                  Document
+                </Button>
+                <Button
+                  type='button'
+                  variant={
+                    materialType === ClassAssignmentEnum.ANNOUNCEMENT
+                      ? "default"
+                      : "outline"
+                  }
+                  size='sm'
+                  onClick={() =>
+                    setMaterialType(ClassAssignmentEnum.ANNOUNCEMENT)
+                  }
+                  className='justify-start'>
+                  <FileText className='h-4 w-4 mr-2' />
+                  Announcement
+                </Button>
+                <Button
+                  type='button'
+                  variant={
+                    materialType === ClassAssignmentEnum.SUBMISSION
+                      ? "default"
+                      : "outline"
+                  }
+                  size='sm'
+                  onClick={() =>
+                    setMaterialType(ClassAssignmentEnum.SUBMISSION)
+                  }
+                  className='justify-start'>
+                  <BookOpen className='h-4 w-4 mr-2' />
+                  Assignment
+                </Button>
+                <Button
+                  type='button'
+                  variant={
+                    materialType === ClassAssignmentEnum.LINK
+                      ? "default"
+                      : "outline"
+                  }
+                  size='sm'
+                  onClick={() => setMaterialType(ClassAssignmentEnum.LINK)}
+                  className='justify-start'>
+                  <Link className='h-4 w-4 mr-2' />
+                  Link
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Title Input */}
           <div className='space-y-2'>
@@ -208,7 +240,7 @@ export default function AddMaterialItem({
           </div>
 
           {/* Link Input - Only for link type */}
-          {materialType === "link" && (
+          {materialType === ClassAssignmentEnum.LINK && (
             <div className='space-y-2'>
               <Label htmlFor='link' className='text-sm font-medium'>
                 Link *
@@ -225,7 +257,7 @@ export default function AddMaterialItem({
           )}
 
           {/* Deadline Input - Only for submission type */}
-          {materialType === "submission" && (
+          {materialType === ClassAssignmentEnum.SUBMISSION && (
             <div className='space-y-2'>
               <Label htmlFor='deadline' className='text-sm font-medium'>
                 Deadline
@@ -244,7 +276,7 @@ export default function AddMaterialItem({
           )}
 
           {/* Description Input - Not for link type */}
-          {materialType !== "link" && (
+          {materialType !== ClassAssignmentEnum.LINK && (
             <div className='space-y-2'>
               <Label htmlFor='description' className='text-sm font-medium'>
                 Description
@@ -260,7 +292,7 @@ export default function AddMaterialItem({
           )}
 
           {/* File Upload Area - Not for link type */}
-          {materialType !== "link" && (
+          {materialType !== ClassAssignmentEnum.LINK && (
             <div className='space-y-2'>
               <Label className='text-sm font-medium'>
                 Attachment (Optional)
@@ -338,12 +370,16 @@ export default function AddMaterialItem({
             onClick={handleSave}
             disabled={
               !title.trim() ||
-              (materialType === "link" && !link.trim()) ||
-              (materialType === "submission" && !deadline.trim()) ||
-              (materialType === "document" && !selectedFile) ||
-              (materialType === "announcement" && !description.trim()) ||
-              (materialType === "submission" && !deadline.trim()) ||
-              (materialType === "document" && !selectedFile)
+              (materialType === ClassAssignmentEnum.LINK && !link.trim()) ||
+              (materialType === ClassAssignmentEnum.SUBMISSION &&
+                !deadline.trim()) ||
+              (materialType === ClassAssignmentEnum.DOCUMENT &&
+                !selectedFile) ||
+              (materialType === ClassAssignmentEnum.ANNOUNCEMENT &&
+                !description.trim()) ||
+              (materialType === ClassAssignmentEnum.SUBMISSION &&
+                !deadline.trim()) ||
+              (materialType === ClassAssignmentEnum.DOCUMENT && !selectedFile)
             }>
             Add Material
           </Button>

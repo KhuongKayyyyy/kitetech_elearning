@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import { BookOpen, Plus } from "lucide-react";
 import ClassworkItem from "@/components/item/ClassworkItem";
 import { FakeData } from "@/app/data/FakeData";
+import AddMaterialItem from "../ui/AddMaterialItem";
+import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 export default function ClassworkList() {
+  const [openAddMaterial, setOpenAddMaterial] = useState(false);
+
   // Fake data for classwork
   const classworkData = [
     {
@@ -79,7 +83,7 @@ export default function ClassworkList() {
 
   const handleCreateAssignment = () => {
     console.log("Creating new assignment");
-    // TODO: Implement create assignment functionality
+    setOpenAddMaterial(true);
   };
 
   // Calculate statistics
@@ -94,6 +98,17 @@ export default function ClassworkList() {
   const completedCount = classworkData.filter(
     (item) => item.status === "submitted" || item.status === "graded"
   ).length;
+
+  function handleSaveMaterial(materialData: {
+    title: string;
+    description?: string | undefined;
+    file?: File | undefined;
+    link?: string | undefined;
+    deadline?: string | undefined;
+    type: ClassAssignmentEnum;
+  }): void {
+    throw new Error("Function not implemented.");
+  }
 
   return (
     <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm'>
@@ -149,6 +164,13 @@ export default function ClassworkList() {
           )}
         </div>
       )}
+
+      <AddMaterialItem
+        open={openAddMaterial}
+        onOpenChange={setOpenAddMaterial}
+        onSave={handleSaveMaterial}
+        type={ClassAssignmentEnum.SUBMISSION}
+      />
     </div>
   );
 }

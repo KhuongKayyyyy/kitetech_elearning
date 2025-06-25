@@ -11,7 +11,7 @@ import PeopleInClassList from "@/components/item_list/PeopleInClassList";
 import ClassworkList from "@/components/item_list/ClassworkList";
 import ClassMeetSection from "@/components/item/ClassMeetSection";
 import { toast, Toaster } from "sonner";
-
+import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
 interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }
@@ -28,9 +28,8 @@ export default function Page({ params }: CoursePageProps) {
     FakeData.getClassSections()
   );
 
-  // Segmentation state
-  const [activeTab, setActiveTab] = useState<"stream" | "classwork" | "people">(
-    "stream"
+  const [activeTab, setActiveTab] = useState<CourseTabEnum>(
+    CourseTabEnum.STREAM
   );
 
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
@@ -120,27 +119,27 @@ export default function Page({ params }: CoursePageProps) {
           <div className='w-full border-b border-neutral-200 dark:border-neutral-700 mb-6'>
             <nav className='flex space-x-8'>
               <button
-                onClick={() => setActiveTab("stream")}
+                onClick={() => setActiveTab(CourseTabEnum.STREAM)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === "stream"
+                  activeTab === CourseTabEnum.STREAM
                     ? "border-primary text-primary"
                     : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
                 }`}>
                 Stream
               </button>
               <button
-                onClick={() => setActiveTab("classwork")}
+                onClick={() => setActiveTab(CourseTabEnum.CLASSWORK)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === "classwork"
+                  activeTab === CourseTabEnum.CLASSWORK
                     ? "border-primary text-primary"
                     : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
                 }`}>
                 Classwork
               </button>
               <button
-                onClick={() => setActiveTab("people")}
+                onClick={() => setActiveTab(CourseTabEnum.PEOPLE)}
                 className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === "people"
+                  activeTab === CourseTabEnum.PEOPLE
                     ? "border-primary text-primary"
                     : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
                 }`}>

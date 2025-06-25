@@ -1,10 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 import { FakeData } from "@/app/data/FakeData";
 import CourseFileItem from "../item/CourseFileItem";
 import { FileText, Upload } from "lucide-react";
+import AddMaterialItem from "../ui/AddMaterialItem";
+import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 export default function CourseFileSection() {
   // Get fake course files data
+
+  const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
+
   const courseFiles = [
     {
       id: 1,
@@ -85,7 +90,9 @@ export default function CourseFileSection() {
         </div>
 
         {FakeData.getCurrentUserRole() === "teacher" && (
-          <button className='flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200'>
+          <button
+            onClick={() => setIsUploadFileModalOpen(true)}
+            className='flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors duration-200'>
             <Upload className='h-4 w-4' />
             Upload File
           </button>
@@ -115,6 +122,12 @@ export default function CourseFileSection() {
           </p>
         </div>
       )}
+      <AddMaterialItem
+        open={isUploadFileModalOpen}
+        onOpenChange={setIsUploadFileModalOpen}
+        onSave={handleViewFile}
+        type={ClassAssignmentEnum.DOCUMENT}
+      />
     </div>
   );
 }

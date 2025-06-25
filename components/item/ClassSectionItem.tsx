@@ -18,6 +18,7 @@ import ClassSectionMaterialRearrangableList from "../item_list/ClassSectionMater
 import { Button } from "../ui/button";
 import AddMaterialItem from "../ui/AddMaterialItem";
 import { toast, Toaster } from "sonner";
+import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 interface ClassSectionItemProps {
   classSection: ClassSectionModel;
@@ -93,7 +94,7 @@ export default function ClassSectionItem({
     file?: File;
     link?: string;
     deadline?: string;
-    type: "document" | "announcement" | "submission" | "link";
+    type: ClassAssignmentEnum;
   }) => {
     // Handle empty array case for ID generation
     const currentIds = classSectionMaterials.map((m) => m.id);
