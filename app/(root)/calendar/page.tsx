@@ -8,13 +8,20 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  CalendarIcon,
+  ChevronLeft,
+  ChevronRight,
+  BookOpen,
+} from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 export default function page() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const router = useRouter();
 
   // Get week start (Monday) for the selected date
   const getWeekStart = (date: Date) => {
@@ -49,17 +56,30 @@ export default function page() {
     return `${start} - ${end}`;
   };
 
+  // Navigate to exam calendar
+  const goToExamCalendar = () => {
+    router.push("/calendar/exam-calendar");
+  };
+
   return (
     <div className='min-h-screen bg-gradient-to-br to-indigo-100 dark:from-gray-900 dark:to-gray-800'>
       <div className='container mx-auto p-6 max-w-7xl'>
         {/* Header Section */}
-        <div className='mb-8'>
-          <h1 className='text-3xl font-bold text-gray-800 dark:text-white mb-2'>
-            Academic Calendar
-          </h1>
-          <p className='text-gray-600 dark:text-gray-300'>
-            Manage your schedule and view upcoming classes
-          </p>
+        <div className='mb-8 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4'>
+          <div>
+            <h1 className='text-3xl font-bold text-gray-800 dark:text-white mb-2'>
+              Academic Calendar
+            </h1>
+            <p className='text-gray-600 dark:text-gray-300'>
+              Manage your schedule and view upcoming classes
+            </p>
+          </div>
+          <Button
+            onClick={goToExamCalendar}
+            className='bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white transition-all duration-200 shadow-lg hover:shadow-xl'>
+            <BookOpen className='h-4 w-4 mr-2' />
+            Exam Calendar
+          </Button>
         </div>
 
         {/* Navigation Controls */}
