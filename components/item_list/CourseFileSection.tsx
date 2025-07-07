@@ -6,8 +6,6 @@ import AddMaterialItem from "../ui/AddMaterialItem";
 import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 export default function CourseFileSection() {
-  // Get fake course files data
-
   const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
 
   const courseFiles = [

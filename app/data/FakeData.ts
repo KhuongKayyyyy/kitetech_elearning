@@ -1,3 +1,5 @@
+import { UserRole } from "./enum/UserRole";
+
 export class FakeData {
   static getCourses() {
     return [
@@ -215,7 +217,7 @@ export class FakeData {
   }
 
   static getCurrentUserRole() {
-    return "teacher";
+    return UserRole.STUDENT;
   }
 
   static getClassSections() {
@@ -350,5 +352,193 @@ export class FakeData {
         content: `# Fable - Manga Reading App `
       },
     ];
+  }
+
+  static getSubjects() {
+    return [
+      {
+        id: "1",
+        subjectId: "101",
+        name: "Financial Accounting",
+        description: "Introduction to financial reporting and analysis.",
+        majorId: "101",
+      departmentId: 1,
+      credits: 3,
+    },
+    {
+      id: "2", 
+      subjectId: "102",
+      name: "Marketing Strategies",
+      description: "Study of consumer behavior and branding techniques.",
+      majorId: "102",
+      departmentId: 1,
+      credits: 3,
+    },
+    {
+      id: "3",
+      subjectId: "103",
+      name: "Corporate Finance",
+      description: "Focus on investment and financial management.",
+      majorId: "103",
+      departmentId: 1,
+      credits: 4,
+    },
+    {
+      id: "4",
+      subjectId: "104",
+      name: "Organizational Leadership",
+      description: "Principles of management and leadership in organizations.",
+      majorId: "104",
+      departmentId: 1,
+      credits: 3,
+    },
+    {
+      id: "5",
+      subjectId: "201",
+      name: "Music Theory",
+      description: "Study of musical structures and composition.",
+      majorId: "201",
+      departmentId: 2,
+      credits: 3,
+    },
+    {
+      id: "6",
+      subjectId: "202",
+      name: "Art History",
+      description: "Exploration of visual arts across cultures and time.",
+      majorId: "202",
+      departmentId: 2,
+      credits: 3,
+    },
+    {
+      id: "7",
+      subjectId: "203",
+      name: "Theater Performance",
+      description: "Practical and theoretical aspects of performing arts.",
+      majorId: "203",
+      departmentId: 2,
+      credits: 4,
+    },
+    {
+      id: "8",
+      subjectId: "204",
+      name: "World Literature",
+      description: "Analysis of literary works from various cultures.",
+      majorId: "204",
+      departmentId: 2,
+      credits: 3,
+    },
+    {
+      id: "9",
+      subjectId: "301",
+      name: "Cell Biology",
+      description: "Study of cellular structures and functions.",
+      majorId: "301",
+      departmentId: 3,
+      credits: 4,
+    },
+    {
+      id: "10",
+      subjectId: "302",
+      name: "Organic Chemistry",
+      description:
+        "Understanding the structure and reactions of organic compounds.",
+      majorId: "302",
+      departmentId: 3,
+      credits: 4,
+    },
+    {
+      id: "11",
+      subjectId: "303",
+      name: "Classical Mechanics",
+      description: "Exploration of motion and forces in physical systems.",
+      majorId: "303",
+      departmentId: 3,
+      credits: 4,
+    },
+    {
+      id: "12",
+      subjectId: "304",
+      name: "Linear Algebra",
+      description: "Study of vector spaces and linear transformations.",
+      majorId: "304",
+      departmentId: 3,
+      credits: 3,
+    },
+    {
+      id: "13",
+      subjectId: "401",
+      name: "Criminal Justice",
+      description: "Overview of criminal law and justice systems.",
+      majorId: "401",
+      departmentId: 4,
+      credits: 3,
+    },
+    {
+      id: "14",
+      subjectId: "402",
+      name: "Corporate Governance",
+      description: "Study of laws governing corporate practices.",
+      majorId: "402",
+      departmentId: 4,
+      credits: 3,
+    },
+    {
+      id: "15",
+      subjectId: "403",
+      name: "International Treaties",
+      description: "Legal frameworks for international agreements.",
+      majorId: "403",
+      departmentId: 4,
+      credits: 3,
+    },
+    {
+      id: "16",
+      subjectId: "404",
+      name: "Constitutional Law",
+      description:
+        "Analysis of constitutional principles and their applications.",
+      majorId: "404",
+      departmentId: 4,
+      credits: 4,
+    },
+    {
+      id: "17",
+      subjectId: "501",
+      name: "Database Systems",
+      description: "Design and management of database systems.",
+      majorId: "501",
+      departmentId: 5,
+      credits: 3,
+    },
+    {
+      id: "18",
+      subjectId: "502",
+      name: "Machine Learning",
+      description: "Introduction to algorithms and models in AI.",
+      majorId: "502",
+      departmentId: 5,
+      credits: 4,
+    },
+    {
+      id: "19",
+      subjectId: "503",
+      name: "Network Security",
+      description: "Techniques for securing digital networks.",
+      majorId: "503",
+      departmentId: 5,
+      credits: 3,
+    },
+    {
+      id: "20",
+      subjectId: "504",
+      name: "Data Structures",
+      description: "Core principles of data organization and manipulation.",
+      majorId: "504",
+      departmentId: 5,
+      credits: 3,
+    },
+  ];
+  
   }
 }

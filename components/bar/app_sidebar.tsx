@@ -20,33 +20,72 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { FakeData } from "@/app/data/FakeData";
+import { UserRole } from "@/app/data/enum/UserRole";
 
 export function AppSidebar() {
   const pathname = usePathname();
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const role = FakeData.getCurrentUserRole();
 
-  const links = [
-    {
-      label: "Courses",
-      href: "/course",
-      icon: <LayoutDashboard className='h-5 w-5 flex-shrink-0' />,
-    },
-    {
-      label: "Calendar",
-      href: "/calendar",
-      icon: <Calendar className='h-5 w-5 flex-shrink-0' />,
-    },
-    {
-      label: "Assignment",
-      href: "/assignment",
-      icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
-    },
-    {
-      label: "Logout",
-      href: "/logout",
-      icon: <LogOut className='h-5 w-5 flex-shrink-0' />,
-    },
-  ];
+  const getLinksForRole = () => {
+    const baseLinks = [
+      {
+        label: "Courses",
+        href: "/course",
+        icon: <LayoutDashboard className='h-5 w-5 flex-shrink-0' />,
+      },
+      {
+        label: "Calendar",
+        href: "/calendar",
+        icon: <Calendar className='h-5 w-5 flex-shrink-0' />,
+      },
+    ];
+
+    if (role === UserRole.TEACHER) {
+      return [
+        ...baseLinks,
+        {
+          label: "Assignments",
+          href: "/assignment",
+          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
+          label: "Settings",
+          href: "/settings",
+          icon: <Settings className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
+          label: "Logout",
+          href: "/logout",
+          icon: <LogOut className='h-5 w-5 flex-shrink-0' />,
+        },
+      ];
+    } else {
+      // student role
+      return [
+        ...baseLinks,
+
+        {
+          label: "Curriculum",
+          href: "/curriculum",
+          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
+          label: "Profile",
+          href: "/profile",
+          icon: <UserCog className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
+          label: "Logout",
+          href: "/logout",
+          icon: <LogOut className='h-5 w-5 flex-shrink-0' />,
+        },
+      ];
+    }
+  };
+
+  const links = getLinksForRole();
 
   const { open, setOpen } = useSidebar();
 
