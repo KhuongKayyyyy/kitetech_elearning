@@ -92,7 +92,7 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
           {/* Header with days */}
           <div className='grid grid-cols-7 gap-2 mb-4'>
             <div className='p-3 text-center font-semibold bg-gray-100 dark:bg-gray-800 rounded-lg'>
-              Section
+              Time
             </div>
             {weekDays.map((day, index) => (
               <div
@@ -110,43 +110,60 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
           </div>
 
           {/* Timetable grid */}
-          {sections.map((section, sectionIndex) => (
-            <div key={sectionIndex} className='grid grid-cols-7 gap-2 mb-2'>
-              {/* Section column */}
-              <div className='p-3 text-center font-medium bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center text-sm'>
-                {section}
-              </div>
+          {sections.map((section, sectionIndex) => {
+            const isBreakTime = sectionIndex === 2; // Section 3 is break time
 
-              {/* Course slots for each day */}
-              {weekDays.map((day, dayIndex) => {
-                const scheduleKey = `${day}-${sectionIndex}`;
-                const courseData =
-                  scheduleData[scheduleKey as keyof typeof scheduleData];
-                const isBreakTime = sectionIndex === 2; // Section 3 is break time
-
-                return (
-                  <div key={`${day}-${sectionIndex}`} className='min-h-[6rem]'>
-                    {courseData ? (
-                      <TimetableItem
-                        className={courseData.className}
-                        courseCode={courseData.courseCode}
-                        room={courseData.room}
-                        period={courseData.period}
-                        week={courseData.week}
-                        group={courseData.group}
-                      />
-                    ) : isBreakTime ? (
-                      <TimetableItem isBreakTime={true} />
-                    ) : (
-                      <div className='bg-gray-50 dark:bg-gray-800 rounded-lg h-24 border-2 border-dashed border-gray-200 dark:border-gray-600 flex items-center justify-center'>
-                        <span className='text-gray-400 text-sm'>Free</span>
-                      </div>
-                    )}
+            if (isBreakTime) {
+              // Special break time row - merged across all days
+              return (
+                <div key={sectionIndex} className='grid grid-cols-7 gap-2 mb-2'>
+                  {/* Section column */}
+                  <div className='p-3 text-center font-medium bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center text-sm'>
+                    {section}
                   </div>
-                );
-              })}
-            </div>
-          ))}
+                  {/* Merged break time across all days */}
+                  <div className='col-span-6'>
+                    <TimetableItem isBreakTime={true} />
+                  </div>
+                </div>
+              );
+            }
+
+            return (
+              <div key={sectionIndex} className='grid grid-cols-7 gap-2 mb-2'>
+                {/* Section column */}
+                <div className='p-3 text-center font-medium bg-gray-50 dark:bg-gray-700 rounded-lg flex items-center justify-center text-sm'>
+                  {section}
+                </div>
+
+                {/* Course slots for each day */}
+                {weekDays.map((day, dayIndex) => {
+                  const scheduleKey = `${day}-${sectionIndex}`;
+                  const courseData =
+                    scheduleData[scheduleKey as keyof typeof scheduleData];
+
+                  return (
+                    <div
+                      key={`${day}-${sectionIndex}`}
+                      className='min-h-[8rem]'>
+                      {courseData ? (
+                        <TimetableItem
+                          className={courseData.className}
+                          courseCode={courseData.courseCode}
+                          room={courseData.room}
+                          period={courseData.period}
+                          week={courseData.week}
+                          group={courseData.group}
+                        />
+                      ) : (
+                        <div className='bg-gray-50 dark:bg-gray-800 rounded-lg h-32 border-2 border-dashed border-gray-200 dark:border-gray-600 flex items-center justify-center'></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

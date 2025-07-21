@@ -94,45 +94,42 @@ export default function CourseFileItem({
   };
 
   return (
-    <div className='group bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 hover:shadow-md hover:border-neutral-300 dark:hover:border-neutral-600 transition-all duration-200'>
-      <div className='flex items-start justify-between gap-3'>
+    <div className='group px-6 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-750 transition-colors duration-200'>
+      <div className='flex flex-col gap-3'>
         {/* File Info */}
-        <div className='flex items-start gap-3 flex-1 min-w-0'>
+        <div className='flex items-center gap-4 flex-1 min-w-0'>
           {/* File Icon */}
-          <div className='flex-shrink-0 p-2 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-700 dark:to-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-600'>
+          <div className='flex-shrink-0 p-2 bg-neutral-50 dark:bg-neutral-700 rounded-lg'>
             {getFileIcon(file.type)}
           </div>
 
           {/* File Details */}
           <div className='flex-1 min-w-0'>
-            <h4 className='text-sm font-semibold text-neutral-900 dark:text-neutral-100 truncate mb-1'>
-              {file.name}
-            </h4>
-
-            <div className='flex items-center gap-2 mb-2'>
+            <div className='flex items-center gap-3 mb-1'>
+              <h4 className='text-sm font-medium text-neutral-900 dark:text-neutral-100 truncate'>
+                {file.name}
+              </h4>
               <span
-                className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-md border ${getFileTypeColor(
+                className={`inline-flex items-center px-2 py-0.5 text-xs font-medium rounded border ${getFileTypeColor(
                   file.type
                 )}`}>
                 {file.type.toUpperCase()}
               </span>
-              <span className='text-xs text-neutral-500 dark:text-neutral-400'>
-                {file.size}
-              </span>
             </div>
 
-            <p className='text-xs text-neutral-500 dark:text-neutral-400'>
-              Uploaded on {file.uploadDate}
-            </p>
+            <div className='flex items-center gap-4 text-xs text-neutral-500 dark:text-neutral-400'>
+              <span>{file.size}</span>
+              <span>Uploaded {file.uploadDate}</span>
+            </div>
           </div>
         </div>
 
         {/* Action Buttons */}
-        <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200'>
+        <div className='flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 justify-end'>
           {onView && (
             <button
               onClick={() => onView(file)}
-              className='p-2 text-neutral-500 dark:text-neutral-400 hover:text-primary dark:hover:text-primary hover:bg-primary/10 dark:hover:bg-primary/20 rounded-lg transition-colors duration-200'
+              className='p-2 text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200'
               title='View file'>
               <Eye className='h-4 w-4' />
             </button>
@@ -143,7 +140,7 @@ export default function CourseFileItem({
               href={file.url}
               target='_blank'
               rel='noopener noreferrer'
-              className='p-2 text-neutral-500 dark:text-neutral-400 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors duration-200'
+              className='p-2 text-neutral-400 hover:text-purple-600 dark:hover:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 rounded-lg transition-colors duration-200'
               title='Open in new tab'>
               <ExternalLink className='h-4 w-4' />
             </a>
@@ -152,7 +149,7 @@ export default function CourseFileItem({
           {onDownload && (
             <button
               onClick={() => onDownload(file)}
-              className='p-2 text-neutral-500 dark:text-neutral-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors duration-200'
+              className='p-2 text-neutral-400 hover:text-green-600 dark:hover:text-green-400 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors duration-200'
               title='Download file'>
               <Download className='h-4 w-4' />
             </button>

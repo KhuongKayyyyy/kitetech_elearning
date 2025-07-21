@@ -135,9 +135,7 @@ export default function ExamCalendarBoard({
                 <div className='space-y-3 max-h-96 overflow-y-auto custom-scrollbar'>
                   {dayExams.length > 0 ? (
                     dayExams.map((exam, examIndex) => (
-                      <div
-                        key={examIndex}
-                        className='transform scale-95 origin-top transition-transform hover:scale-100'>
+                      <div key={examIndex}>
                         <ExamCalendarItem examination={exam} />
                       </div>
                     ))

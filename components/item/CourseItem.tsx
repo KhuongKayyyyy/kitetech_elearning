@@ -10,10 +10,14 @@ interface CourseItemProps {
 
 export default function CourseItem({ course }: CourseItemProps) {
   const router = useRouter();
+  const handleClick = () => {
+    router.push(`/course/${course.id}`);
+  };
 
   return (
-    <div className='h-full' onClick={() => router.push(`/course/${course.id}`)}>
+    <div className='h-full'>
       <div
+        onClick={handleClick}
         key={course.id}
         className='group bg-white dark:bg-neutral-800 border-2 border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:border-primary/30 hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] h-full flex flex-col'>
         {/* Header */}
@@ -52,31 +56,17 @@ export default function CourseItem({ course }: CourseItemProps) {
               {course.location}
             </span>
           </div>
-          <div className='flex items-center gap-2'>
-            <Users className='h-4 w-4 text-neutral-500 flex-shrink-0' />
-            <span className='text-sm text-neutral-700 dark:text-neutral-300'>
-              {course.enrolled} students enrolled
-            </span>
-          </div>
         </div>
 
-        {/* Description */}
-        <div className='flex-1 mb-6'>
-          <p className='text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed line-clamp-4'>
-            {course.description}
-          </p>
-        </div>
-
+        <div className='mt-15'></div>
         {/* Actions */}
-        <div className='flex items-center justify-between mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700'>
+        <div
+          onClick={handleClick}
+          className='flex items-center justify-between mt-auto pt-4 border-t border-neutral-200 dark:border-neutral-700'>
           <button className='inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary hover:bg-primary/90 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 shadow-sm'>
             <BookOpen className='h-4 w-4' />
             View Details
           </button>
-          <div className='flex items-center gap-1 text-xs text-neutral-500'>
-            <Calendar className='h-3 w-3' />
-            <span>{course.semester}</span>
-          </div>
         </div>
       </div>
     </div>

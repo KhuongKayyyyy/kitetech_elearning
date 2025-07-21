@@ -99,7 +99,7 @@ export default function Page({ params }: CoursePageProps) {
           closeButton
           duration={4000}
         />
-        <div className='flex-1'>
+        <div className='flex-[3]'>
           <div className='w-full'>
             <CourseBriefInformation course={course} />
           </div>
@@ -153,7 +153,7 @@ export default function Page({ params }: CoursePageProps) {
         </div>
 
         {/* Right Sidebar (visible only on large screens) */}
-        <aside className='hidden lg:block lg:w-120 shrink-0 py-6'>
+        <aside className='hidden lg:block lg:w-80 shrink-0 py-6'>
           <ClassMeetSection />
           <div className='mt-6'></div>
           <CourseProcess />

@@ -69,16 +69,16 @@ export default function CourseFilter({
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   return (
-    <div className='space-y-6'>
-      {/* Semester Dropdown */}
-      <div className='space-y-2'>
+    <div className='flex flex-col lg:flex-row gap-6 items-start lg:items-center'>
+      {/* Academic Period Section */}
+      <div className='space-y-3'>
         <label className='text-sm font-semibold text-neutral-700 dark:text-neutral-300'>
           Academic Period
         </label>
         <div className='relative'>
           <button
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-            className='w-full flex items-center justify-between px-4 py-3 text-sm font-medium border-2 border-black rounded-xl bg-white dark:bg-neutral-800  dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary '>
+            className='w-full sm:w-64 h-12 flex items-center justify-between px-4 py-3 text-sm font-medium border-2 rounded-xl bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary'>
             <span className='text-neutral-900 dark:text-neutral-100'>
               {selectedSemester}
             </span>
@@ -90,7 +90,7 @@ export default function CourseFilter({
           </button>
 
           {isDropdownOpen && (
-            <div className='absolute top-full left-0 right-0 mt-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl z-20 overflow-hidden backdrop-blur-sm'>
+            <div className='absolute top-full left-0 w-full sm:w-64 mt-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-xl z-20 overflow-hidden backdrop-blur-sm'>
               {SEMESTERS.map((semester, index) => (
                 <button
                   key={semester}
@@ -113,12 +113,15 @@ export default function CourseFilter({
         </div>
       </div>
 
-      {/* Course Type Filters */}
-      <div className='space-y-2'>
+      {/* Separator Line - Only visible on large screens */}
+      <div className='hidden lg:block h-8 border-l border-neutral-200 dark:border-neutral-700'></div>
+
+      {/* Course Categories Section */}
+      <div className='space-y-3 flex-1'>
         <label className='text-sm font-semibold text-neutral-700 dark:text-neutral-300'>
           Course Categories
         </label>
-        <div className='grid grid-cols-2 md:grid-cols-3 lg:flex lg:flex-wrap gap-3'>
+        <div className='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3'>
           {COURSE_TYPES.map((type) => (
             <FilterSubjectButton
               key={type.id}
@@ -154,15 +157,15 @@ export function FilterSubjectButton({
   return (
     <button
       onClick={onClick}
-      className={`group flex items-center gap-3 px-4 py-3 text-sm font-medium border rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/20 ${
+      className={`group flex items-center gap-3 px-4 py-3 h-12 text-sm font-medium border rounded-xl transition-all duration-200 transform hover:scale-[1.02] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary/20 ${
         isSelected
-          ? " border-black border-2 shadow-lg shadow-primary/25"
+          ? "bg-primary/10 border-primary text-primary shadow-lg shadow-primary/25"
           : "bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600 text-neutral-700 dark:text-neutral-300"
       }`}>
       <div
         className={`flex items-center justify-center w-8 h-8 rounded-lg transition-all duration-200 ${
           isSelected
-            ? "bg-primary/40 border-2 border-black "
+            ? "bg-primary/20 text-primary"
             : `${bgColor} ${color} group-hover:scale-110`
         }`}>
         {icon}

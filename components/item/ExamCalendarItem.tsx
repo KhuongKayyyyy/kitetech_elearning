@@ -41,7 +41,7 @@ export default function ExamCalendarItem({
   };
 
   return (
-    <Card className='w-full max-w-64 bg-gradient-to-br from-blue-400 to-blue-600 text-white border-0 transition-all duration-300 hover:shadow-xl hover:scale-105 hover:from-blue-500 hover:to-blue-700 cursor-pointer transform'>
+    <Card className='w-full max-w-64 bg-gradient-to-br from-blue-400 to-blue-600 text-white border-0 transition-all duration-300 hover:shadow-xl hover:from-blue-500 hover:to-blue-700 hover:brightness-110 cursor-pointer'>
       <CardHeader className='pb-2'>
         <div className='text-center'>
           <CardTitle className='text-sm font-bold mb-1 leading-tight'>

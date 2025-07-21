@@ -39,16 +39,10 @@ export default function TimetableItem({
       className=' bg-olive-500 text-white p-2 rounded-lg shadow-sm h-32 flex flex-col justify-between text-xs leading-tight hover:shadow-lg hover:scale-105 hover:brightness-110 transition-all duration-200 cursor-pointer'
       style={{ backgroundColor: "#8B966D" }}>
       <div className='space-y-1'>
-        <div className='font-medium text-center'>{className}</div>
-        <div className='text-center'>
-          ({courseCode} - Nhóm|Group: {group})
-        </div>
+        <div className='font-extrabold text-center'>{className}</div>
       </div>
-
       <div className='space-y-1 text-center'>
-        <div>Tiết|Period: {period}</div>
         <div>(Phòng:|Room: {room})</div>
-        <div>Tuần học|Week: {week}</div>
       </div>
     </div>
   );
