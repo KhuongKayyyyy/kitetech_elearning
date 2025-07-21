@@ -14,6 +14,8 @@ import {
   LogOut,
   Calendar,
   BookOpen,
+  ListTodo,
+  ListOrdered,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -46,11 +48,6 @@ export function AppSidebar() {
       return [
         ...baseLinks,
         {
-          label: "Assignments",
-          href: "/assignment",
-          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
-        },
-        {
           label: "Settings",
           href: "/settings",
           icon: <Settings className='h-5 w-5 flex-shrink-0' />,
@@ -67,9 +64,19 @@ export function AppSidebar() {
         ...baseLinks,
 
         {
+          label: "Assignments",
+          href: "/assignment",
+          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
           label: "Curriculum",
           href: "/curriculum",
-          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
+          icon: <ListOrdered className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
+          label: "Registration",
+          href: "/registration",
+          icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Profile",

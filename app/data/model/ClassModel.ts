@@ -13,4 +13,7 @@ interface Course {
     type: string;
     semester: string;
   }
+
+
+  
   

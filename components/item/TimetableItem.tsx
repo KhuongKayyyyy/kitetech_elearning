@@ -40,6 +40,10 @@ export default function TimetableItem({
       style={{ backgroundColor: "#8B966D" }}>
       <div className='space-y-1'>
         <div className='font-extrabold text-center'>{className}</div>
+        <div className='font-semibold text-center'>
+          {" "}
+          Course Code: {courseCode}
+        </div>
       </div>
       <div className='space-y-1 text-center'>
         <div>(Phòng:|Room: {room})</div>
