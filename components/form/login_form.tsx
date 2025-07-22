@@ -23,7 +23,7 @@ import {
   GraduationCap,
 } from "lucide-react";
 import Link from "next/link";
-import { useAuthentication } from "@/app/data/hooks/useAuthentication";
+import { useAuthentication } from "@/hooks/useAuthentication";
 import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Menu,
   Search,
@@ -15,11 +15,13 @@ import { usePathname } from "next/navigation";
 import { useBreadcrumbs } from "@/hooks/useBreadcrumbs";
 import Link from "next/link";
 import { useSidebar } from "../ui/sidebar";
+import UserDropdownMenu from "../item/UserDropdonwMenu";
+import { useAuthentication } from "@/hooks/useAuthentication";
 
 const TopbarContent = () => {
   const { setOpen } = useSidebar();
   const pathname = usePathname();
-
+  const [isOpen, setIsOpen] = useState(false);
   const getBreadcrumbs = () => {
     const paths = pathname.split("/").filter(Boolean);
     return paths.map((path) => {
@@ -28,7 +30,7 @@ const TopbarContent = () => {
   };
 
   const breadcrumbs = useBreadcrumbs();
-
+  const { user } = useAuthentication();
   return (
     <>
       <div className=' h-16 p-6 sm:px-8 flex items-center justify-between border-b border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900'>
@@ -77,15 +79,24 @@ const TopbarContent = () => {
             <MessageSquare className='h-5 w-5 sm:h-6 sm:w-6 text-neutral-600 dark:text-neutral-400' />
           </button>
 
-          <div className='flex items-center gap-2 sm:gap-3 cursor-pointer p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors'>
-            <Image
-              src='/assets/image/logo.png'
-              alt='Student Avatar'
-              width={32}
-              height={32}
-              className='rounded-full sm:w-9 sm:h-9'
-            />
-            <ChevronDown className='h-4 w-4 sm:h-5 sm:w-5 text-neutral-600 dark:text-neutral-400' />
+          <div className='relative'>
+            <div
+              onClick={() => setIsOpen(!isOpen)}
+              className='flex items-center gap-2 sm:gap-3 cursor-pointer p-1.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors'>
+              <Image
+                src='/assets/image/logo.png'
+                alt='Student Avatar'
+                width={32}
+                height={32}
+                className='rounded-full sm:w-9 sm:h-9'
+              />
+              <ChevronDown
+                className={`h-4 w-4 sm:h-5 sm:w-5 text-neutral-600 dark:text-neutral-400 transition-transform duration-200 ${
+                  isOpen ? "rotate-180" : "rotate-0"
+                }`}
+              />
+            </div>
+            <UserDropdownMenu isOpen={isOpen} setIsOpen={setIsOpen} />
           </div>
         </div>
       </div>
