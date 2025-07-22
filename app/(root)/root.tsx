@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { AppSidebar } from "@/components/bar/app_sidebar";
 import AppTopbar from "@/components/bar/app_topbar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Toaster } from "sonner";
 
 interface RootProps {
   children: React.ReactNode;
