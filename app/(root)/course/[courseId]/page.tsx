@@ -40,13 +40,11 @@ export default function Page({ params }: CoursePageProps) {
   };
 
   const handleConfirmAddSection = () => {
-    if (newSectionName.trim()) {
+    if (newSectionName.trim() && course) {
       const newSection = {
         id: Date.now(),
-        courseId: course?.id ?? 0,
+        course: course,
         name: newSectionName.trim(),
-        description: "New class section",
-        materials: [],
         section: classSections.length + 1,
       };
       setClassSections((prev) => [...prev, newSection]);

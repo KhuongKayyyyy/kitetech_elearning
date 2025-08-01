@@ -224,25 +224,25 @@ export class FakeData {
     return [
       {
         id: 1,
-        courseId: 1,
+        course: this.getCourses()[0],
         section: 1,
         name: "Section 1",
       },
       {
         id: 2,
-        courseId: 1,
+        course: this.getCourses()[0],
         section: 2,
         name: "Section 2",
       },
       {
         id: 3,
-        courseId: 1,
+        course: this.getCourses()[0],
         section: 3,
         name: "Section 3",
       },
       {
         id: 4,
-        courseId: 1,
+        course: this.getCourses()[0],
         section: 4,
         name: "Section 4",
       },

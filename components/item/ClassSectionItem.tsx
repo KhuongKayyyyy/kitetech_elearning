@@ -10,6 +10,9 @@ import {
   X,
   Trash2,
   Link,
+  ChevronDown,
+  ChevronUp,
+  QrCode,
 } from "lucide-react";
 import { FakeData } from "@/app/data/FakeData";
 import ClassSectionMaterialItem from "./ClassSectionMaterialItem";
@@ -19,15 +22,18 @@ import { Button } from "../ui/button";
 import AddMaterialItem from "../ui/AddMaterialItem";
 import { toast, Toaster } from "sonner";
 import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
+import NameRecognitionDialog from "../dialog/name_recognition_dialog";
 
 interface ClassSectionItemProps {
   classSection: ClassSectionModel;
   onDeleteSection?: (sectionId: number) => void;
+  defaultExpanded?: boolean;
 }
 
 export default function ClassSectionItem({
   classSection,
   onDeleteSection,
+  defaultExpanded = false,
 }: ClassSectionItemProps) {
   const [classSectionMaterials, setClassSectionMaterials] = useState(
     FakeData.getClassSectionMaterial().filter(
@@ -40,6 +46,10 @@ export default function ClassSectionItem({
   const [isEditingName, setIsEditingName] = useState(false);
   const [isAddDocumentMaterialOpen, setIsAddDocumentMaterialOpen] =
     useState(false);
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+  const [isNameRecognitionDialogOpen, setIsNameRecognitionDialogOpen] =
+    useState(false);
+
   // Add scroll effect for section jumping
   useEffect(() => {
     const handleHashChange = () => {
@@ -56,6 +66,8 @@ export default function ClassSectionItem({
           setTimeout(() => {
             element.style.boxShadow = "";
           }, 2000);
+          // Auto-expand when navigating to section
+          setIsExpanded(true);
         }
       }
     };
@@ -159,6 +171,11 @@ export default function ClassSectionItem({
     setIsAddDocumentMaterialOpen(false);
   };
 
+  const toggleExpanded = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div
       id={`section-${classSection.id}`}
@@ -205,7 +222,7 @@ export default function ClassSectionItem({
                     setIsEditingName(true);
                   } else {
                     router.push(
-                      `/course/${classSection.courseId}/lesson/${classSection.id}`
+                      `/course/${classSection.course}/lesson/${classSection.id}`
                     );
                   }
                 }}
@@ -226,6 +243,16 @@ export default function ClassSectionItem({
               {classSectionMaterials.length} materials
             </span>
           </div>
+          {/* Expand/Collapse Button */}
+          <button
+            onClick={toggleExpanded}
+            className='p-2.5 rounded-xl transition-all duration-200 text-neutral-500 dark:text-neutral-400 hover:text-primary dark:hover:text-primary hover:bg-neutral-100 dark:hover:bg-neutral-700 border-2 border-transparent hover:border-primary/20'>
+            {isExpanded ? (
+              <ChevronUp className='h-4 w-4' />
+            ) : (
+              <ChevronDown className='h-4 w-4' />
+            )}
+          </button>
           {FakeData.getCurrentUserRole() === "teacher" && (
             <>
               <button
@@ -256,47 +283,89 @@ export default function ClassSectionItem({
           )}
         </div>
       </div>
-      {/* Materials Section */}
-      {isEditMode ? (
-        <ClassSectionMaterialRearrangableList
-          initialMaterials={classSectionMaterials}
-          onAddMaterial={() => {
-            // TODO: Implement add material functionality
-            console.log("Add material clicked");
-          }}
-          onRemoveMaterial={(materialId) => {
-            // TODO: Implement remove material functionality
-            console.log("Remove material clicked", materialId);
-          }}
-        />
-      ) : (
-        <div className='space-y-3'>
-          <div className='space-y-2'>
-            {classSectionMaterials.map((material, index) => (
-              <div
-                key={material.id}
-                className='animate-in slide-in-from-left duration-300'
-                style={{ animationDelay: `${index * 100}ms` }}>
-                <ClassSectionMaterialItem material={material} />
+
+      {/* Materials Section - Only show when expanded */}
+      {isExpanded && (
+        <>
+          {isEditMode ? (
+            <ClassSectionMaterialRearrangableList
+              initialMaterials={classSectionMaterials}
+              onAddMaterial={() => {
+                // TODO: Implement add material functionality
+                console.log("Add material clicked");
+              }}
+              onRemoveMaterial={(materialId) => {
+                // TODO: Implement remove material functionality
+                console.log("Remove material clicked", materialId);
+              }}
+            />
+          ) : (
+            <div className='space-y-3'>
+              <div className='space-y-2'>
+                {classSectionMaterials.map((material, index) => (
+                  <div
+                    key={material.id}
+                    className='animate-in slide-in-from-left duration-300'
+                    style={{ animationDelay: `${index * 100}ms` }}>
+                    <ClassSectionMaterialItem material={material} />
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+          )}
+
+          {/* Add Material Button for Teachers */}
+          {FakeData.getCurrentUserRole() === "teacher" && !isEditMode && (
+            <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAddDocumentMaterialOpen(true);
+                }}
+                className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
+                <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
+                <span className='font-medium'>Add Material</span>
+              </button>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Compressed mode preview - Show when collapsed and has materials */}
+      {!isExpanded && classSectionMaterials.length > 0 && (
+        <div className='space-y-3'>
+          <div className='flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400'>
+            <span>
+              {classSectionMaterials.length} material
+              {classSectionMaterials.length !== 1 ? "s" : ""} available
+            </span>
+            <div className='flex gap-1'>
+              {classSectionMaterials.slice(0, 3).map((material, index) => (
+                <div
+                  key={material.id}
+                  className='w-2 h-2 bg-primary/40 rounded-full'
+                />
+              ))}
+              {classSectionMaterials.length > 3 && (
+                <span className='text-xs'>
+                  +{classSectionMaterials.length - 3}
+                </span>
+              )}
+            </div>
           </div>
+          <NameRecognitionDialog
+            qrCodeValue={JSON.stringify({
+              classId: classSection.id,
+              date: new Date().toISOString(),
+              classSessionID: "sess_abc123",
+              name: classSection.name + classSection.course.name,
+            })}
+            isOpen={isNameRecognitionDialogOpen}
+            onOpenChange={setIsNameRecognitionDialogOpen}
+          />
         </div>
       )}
-      {/* Add Material Button for Teachers */}
-      {FakeData.getCurrentUserRole() === "teacher" && !isEditMode && (
-        <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsAddDocumentMaterialOpen(true);
-            }}
-            className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
-            <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
-            <span className='font-medium'>Add Material</span>
-          </button>
-        </div>
-      )}
+
       {/* add dialog */}
       <AddMaterialItem
         open={isAddDocumentMaterialOpen}
@@ -312,6 +381,7 @@ export default function ClassSectionItem({
           }
         }}
       />
+
       <Toaster></Toaster>
     </div>
   );

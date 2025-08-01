@@ -1,6 +1,6 @@
 interface ClassSectionModel {
   id: number;
-  courseId: number;
+  course: Course;
   section: number;
   name: string;
 }
