@@ -1,87 +1,58 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Users } from "lucide-react";
 import PeopleInClassItem from "@/components/item/PeopleInClassItem";
+import { UserModel } from "@/app/data/model/UserModel";
+import { FakeData } from "@/app/data/FakeData";
 
-export default function PeopleInClassList() {
-  // Fake data for people in class
-  const classMembers = [
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      email: "sarah.johnson@university.edu",
-      role: "teacher" as const,
-      avatar: "",
-      phone: "+1 (555) 123-4567",
-      status: "online" as const,
-    },
-    {
-      id: 2,
-      name: "Michael Chen",
-      email: "michael.chen@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 234-5678",
-      status: "online" as const,
-    },
-    {
-      id: 3,
-      name: "Emily Rodriguez",
-      email: "emily.rodriguez@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 345-6789",
-      status: "offline" as const,
-    },
-    {
-      id: 4,
-      name: "David Park",
-      email: "david.park@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 456-7890",
-      status: "online" as const,
-    },
-    {
-      id: 5,
-      name: "Prof. James Wilson",
-      email: "james.wilson@university.edu",
-      role: "teacher" as const,
-      avatar: "",
-      phone: "+1 (555) 567-8901",
-      status: "offline" as const,
-    },
-    {
-      id: 6,
-      name: "Anna Thompson",
-      email: "anna.thompson@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 678-9012",
-      status: "online" as const,
-    },
-    {
-      id: 7,
-      name: "Alex Kim",
-      email: "alex.kim@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 789-0123",
-      status: "offline" as const,
-    },
-    {
-      id: 8,
-      name: "Lisa Wang",
-      email: "lisa.wang@student.edu",
-      role: "student" as const,
-      avatar: "",
-      phone: "+1 (555) 890-1234",
-      status: "online" as const,
-    },
-  ];
+interface PeopleInClassListProps {
+  courseId: number;
+}
+
+export default function PeopleInClassList({
+  courseId,
+}: PeopleInClassListProps) {
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const classStudents = FakeData.getEnrolledStudentsForCourse(courseId);
+  const classTeacher = FakeData.getTeacherForCourse(courseId);
+
+  // Transform students to match expected format
+  const transformedStudents = classStudents.map((student: UserModel) => ({
+    id: student.id,
+    name: student.full_name,
+    email: student.email,
+    role: "student" as const,
+    avatar: student.avatar,
+    phone: "",
+    status: student.isActive ? ("online" as const) : ("offline" as const),
+  }));
+
+  // Transform teacher to match expected format
+  const transformedTeacher = classTeacher
+    ? {
+        id: classTeacher.id,
+        name: classTeacher.full_name,
+        email: classTeacher.email,
+        role: "teacher" as const,
+        avatar: classTeacher.avatar,
+        phone: "",
+        status: classTeacher.isActive
+          ? ("online" as const)
+          : ("offline" as const),
+      }
+    : null;
 
   // Separate teachers and students
-  const teachers = classMembers.filter((person) => person.role === "teacher");
-  const students = classMembers.filter((person) => person.role === "student");
+  const teachers = transformedTeacher ? [transformedTeacher] : [];
+  const students = transformedStudents;
 
   const handleMessage = (person: any) => {
     console.log("Messaging:", person);
@@ -92,6 +63,65 @@ export default function PeopleInClassList() {
     console.log("Calling:", person);
     // TODO: Implement calling functionality
   };
+
+  if (isLoading) {
+    return (
+      <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm my-5'>
+        {/* Header Skeleton */}
+        <div className='flex items-center gap-3 mb-6'>
+          <div className='p-2 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-9 h-9 animate-pulse'></div>
+          <div>
+            <div className='h-5 bg-neutral-200 dark:bg-neutral-700 rounded w-32 mb-2 animate-pulse'></div>
+            <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-24 animate-pulse'></div>
+          </div>
+        </div>
+
+        {/* Teachers Section Skeleton */}
+        <div className='mb-6'>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-20 mb-3 animate-pulse'></div>
+          <div className='space-y-3'>
+            {[1, 2].map((i) => (
+              <div
+                key={i}
+                className='flex items-center gap-3 p-3 rounded-lg border border-neutral-200 dark:border-neutral-700'>
+                <div className='w-10 h-10 bg-neutral-200 dark:bg-neutral-700 rounded-full animate-pulse'></div>
+                <div className='flex-1'>
+                  <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-24 mb-1 animate-pulse'></div>
+                  <div className='h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-32 animate-pulse'></div>
+                </div>
+                <div className='flex gap-2'>
+                  <div className='w-8 h-8 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse'></div>
+                  <div className='w-8 h-8 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse'></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Students Section Skeleton */}
+        <div>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-20 mb-3 animate-pulse'></div>
+          <div className='space-y-3'>
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className='flex items-center gap-3 p-3 rounded-lg border border-neutral-200 dark:border-neutral-700'>
+                <div className='w-10 h-10 bg-neutral-200 dark:bg-neutral-700 rounded-full animate-pulse'></div>
+                <div className='flex-1'>
+                  <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-24 mb-1 animate-pulse'></div>
+                  <div className='h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-32 animate-pulse'></div>
+                </div>
+                <div className='flex gap-2'>
+                  <div className='w-8 h-8 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse'></div>
+                  <div className='w-8 h-8 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse'></div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm my-5'>
@@ -118,7 +148,7 @@ export default function PeopleInClassList() {
             Teachers ({teachers.length})
           </h4>
           <div className='space-y-3'>
-            {teachers.map((teacher) => (
+            {teachers.map((teacher: any) => (
               <PeopleInClassItem
                 key={teacher.id}
                 person={teacher}
@@ -137,7 +167,7 @@ export default function PeopleInClassList() {
             Students ({students.length})
           </h4>
           <div className='space-y-3'>
-            {students.map((student) => (
+            {students.map((student: any) => (
               <PeopleInClassItem
                 key={student.id}
                 person={student}
@@ -150,7 +180,7 @@ export default function PeopleInClassList() {
       )}
 
       {/* Empty State */}
-      {classMembers.length === 0 && (
+      {teachers.length === 0 && students.length === 0 && (
         <div className='text-center py-8'>
           <Users className='h-12 w-12 text-neutral-400 dark:text-neutral-500 mx-auto mb-3' />
           <h4 className='text-lg font-medium text-neutral-500 dark:text-neutral-400 mb-2'>

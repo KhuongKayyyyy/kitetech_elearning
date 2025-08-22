@@ -1,3 +1,8 @@
+export enum Role {
+    STUDENT = "student",
+    TEACHER = "teacher",
+}
+
 export interface UserModel {
     id: number;
     username: string;
@@ -11,4 +16,6 @@ export interface UserModel {
     updated_at: string;
     avatar: string;
   }
-  
+
+
+

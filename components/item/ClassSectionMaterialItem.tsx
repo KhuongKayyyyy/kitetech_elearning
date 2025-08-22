@@ -48,7 +48,7 @@ export default function ClassSectionMaterialItem({
   const isExpanded =
     propIsExpanded !== undefined ? propIsExpanded : internalIsExpanded;
   const router = useRouter();
-  const courseId = FakeData.getCourses()[0].id;
+  const courseId = CourseData.getCourses()[0].id;
   const currentUserRole = FakeData.getCurrentUserRole();
 
   const handleTitleClick = () => {

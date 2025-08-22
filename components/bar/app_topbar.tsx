@@ -70,15 +70,6 @@ const TopbarContent = () => {
             <Search className='h-5 w-5 text-neutral-600 dark:text-neutral-400' />
           </button>
 
-          <button className='p-2 sm:p-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors relative'>
-            <Bell className='h-5 w-5 sm:h-6 sm:w-6 text-neutral-600 dark:text-neutral-400' />
-            <span className='absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full'></span>
-          </button>
-
-          <button className='p-2 sm:p-2.5 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors'>
-            <MessageSquare className='h-5 w-5 sm:h-6 sm:w-6 text-neutral-600 dark:text-neutral-400' />
-          </button>
-
           <div className='relative'>
             <div
               onClick={() => setIsOpen(!isOpen)}

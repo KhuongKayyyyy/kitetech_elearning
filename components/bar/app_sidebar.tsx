@@ -53,6 +53,11 @@ export function AppSidebar() {
           icon: <Settings className='h-5 w-5 flex-shrink-0' />,
         },
         {
+          label: "Score",
+          href: "/score",
+          icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
           label: "Logout",
           href: "/logout",
           icon: <LogOut className='h-5 w-5 flex-shrink-0' />,

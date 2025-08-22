@@ -2,13 +2,14 @@
 import CourseFilter from "@/components/CourseFilter";
 import CourseItem from "@/components/item/CourseItem";
 import { useMemo, useState } from "react";
-import { FakeData } from "@/app/data/FakeData";
 import CourseSidebar from "@/components/bar/CourseSidebar";
 import AcademicYearList from "@/components/item_list/AcaList";
 import CreateAcademicYearTestButton from "@/components/item/temp_item";
+import { FakeData } from "@/app/data/FakeData";
+import { CourseData } from "@/app/data/api/course_data";
 
 export default function Home() {
-  const course = FakeData.getCourses();
+  const course = CourseData.getCourses();
 
   // filter state
   const [selectedSemester, setSelectedSemester] = useState("HK1 2023-2024");
@@ -32,8 +33,6 @@ export default function Home() {
           <div className='flex items-center justify-between'>
             <h1 className='text-2xl font-bold'>Courses</h1>
           </div>
-          <CreateAcademicYearTestButton />
-          <AcademicYearList />
           <CourseFilter
             selectedSemester={selectedSemester}
             setSelectedSemester={setSelectedSemester}

@@ -4,7 +4,7 @@ import { FakeData } from "@/app/data/FakeData";
 import { BookOpen, Calendar, Check, X } from "lucide-react";
 
 export default function RegistedSubjectTable() {
-  const registeredSubjects = FakeData.getCourses();
+  const registeredSubjects = CourseData.getCourses();
 
   return (
     <div className='w-full bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 min-h-screen p-6'>

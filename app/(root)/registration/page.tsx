@@ -8,7 +8,7 @@ import { Toaster } from "sonner";
 import { BookOpen, GraduationCap, Plus, List } from "lucide-react";
 
 export default function Page() {
-  const availableSubjects = FakeData.getCourses();
+  const availableSubjects = CourseData.getCourses();
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(
     new Set()
   );

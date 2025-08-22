@@ -2,6 +2,7 @@ import React from "react";
 import { Calendar, Clock, MapPin, BookOpen } from "lucide-react";
 import { FakeData } from "../../app/data/FakeData";
 import ClassScheduleItem from "../item/ClassScheduleItem";
+import { CourseData } from "@/app/data/api/course_data";
 export default function TodayCalendar() {
   const timeSlots = [
     "Section 1",
@@ -19,7 +20,7 @@ export default function TodayCalendar() {
   });
 
   // Get courses and course schedule
-  const courses = FakeData.getCourses();
+  const courses = CourseData.getCourses();
   const courseSchedule = FakeData.getCourseSchedule();
 
   // Get today's date object (no time)

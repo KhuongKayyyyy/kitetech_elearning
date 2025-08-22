@@ -14,7 +14,7 @@ interface BreadcrumbItem {
 async function resolveBreadcrumb(segment: string, id: string): Promise<string> {
   switch (segment) {
     case "course": {
-      const courses = FakeData.getCourses();
+      const courses = CourseData.getCourses();
       const course = courses.find((item) => String(item.id) === id);
       return course?.name ?? id;
     }

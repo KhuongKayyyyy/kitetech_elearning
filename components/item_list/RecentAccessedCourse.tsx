@@ -2,10 +2,11 @@ import React from "react";
 import { BookOpen, Clock, User } from "lucide-react";
 import { FakeData } from "../../app/data/FakeData";
 import RecentAccessCourseItem from "../item/RecentAccessCourseItem";
+import { CourseData } from "@/app/data/api/course_data";
 
 export default function RecentAccessedCourse() {
   // Get first 5 courses from fake data as recent accessed courses
-  const recentCourses = FakeData.getCourses().slice(0, 5);
+  const recentCourses = CourseData.getCourses().slice(0, 5);
 
   return (
     <div className='p-6 w-full max-w-4xl'>

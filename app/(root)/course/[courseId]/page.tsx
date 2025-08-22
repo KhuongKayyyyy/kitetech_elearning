@@ -12,6 +12,7 @@ import ClassworkList from "@/components/item_list/ClassworkList";
 import ClassMeetSection from "@/components/item/ClassMeetSection";
 import { toast, Toaster } from "sonner";
 import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
+import ClassScoreTable from "./ClassScoreTable";
 interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }
@@ -19,7 +20,7 @@ interface CoursePageProps {
 export default function Page({ params }: CoursePageProps) {
   const actualParams = React.use(params);
 
-  const course = FakeData.getCourses().find(
+  const course = CourseData.getCourses().find(
     (c) => c.id === parseInt(actualParams.courseId)
   );
 
@@ -34,6 +35,8 @@ export default function Page({ params }: CoursePageProps) {
 
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
+
+  const userRole = FakeData.getCurrentUserRole();
 
   const handleAddSection = () => {
     setIsAddSectionModalOpen(true);
@@ -79,7 +82,9 @@ export default function Page({ params }: CoursePageProps) {
       case "classwork":
         return <ClassworkList />;
       case "people":
-        return <PeopleInClassList />;
+        return <PeopleInClassList courseId={course.id} />;
+      case "score":
+        return <ClassScoreTable courseId={course.id} />;
       default:
         return null;
     }
@@ -125,24 +130,49 @@ export default function Page({ params }: CoursePageProps) {
                 }`}>
                 Stream
               </button>
-              <button
-                onClick={() => setActiveTab(CourseTabEnum.CLASSWORK)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === CourseTabEnum.CLASSWORK
-                    ? "border-primary text-primary"
-                    : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
-                }`}>
-                Classwork
-              </button>
-              <button
-                onClick={() => setActiveTab(CourseTabEnum.PEOPLE)}
-                className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
-                  activeTab === CourseTabEnum.PEOPLE
-                    ? "border-primary text-primary"
-                    : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
-                }`}>
-                People
-              </button>
+              {userRole === "teacher" ? (
+                <>
+                  <button
+                    onClick={() => setActiveTab(CourseTabEnum.PEOPLE)}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                      activeTab === CourseTabEnum.PEOPLE
+                        ? "border-primary text-primary"
+                        : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
+                    }`}>
+                    People
+                  </button>
+                  <button
+                    onClick={() => setActiveTab(CourseTabEnum.SCORE)}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                      activeTab === CourseTabEnum.SCORE
+                        ? "border-primary text-primary"
+                        : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
+                    }`}>
+                    Score
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setActiveTab(CourseTabEnum.CLASSWORK)}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                      activeTab === CourseTabEnum.CLASSWORK
+                        ? "border-primary text-primary"
+                        : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
+                    }`}>
+                    Classwork
+                  </button>
+                  <button
+                    onClick={() => setActiveTab(CourseTabEnum.PEOPLE)}
+                    className={`py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                      activeTab === CourseTabEnum.PEOPLE
+                        ? "border-primary text-primary"
+                        : "border-transparent text-neutral-500 dark:text-neutral-400 hover:text-neutral-700 dark:hover:text-neutral-300 hover:border-neutral-300 dark:hover:border-neutral-600"
+                    }`}>
+                    People
+                  </button>
+                </>
+              )}
             </nav>
           </div>
 
