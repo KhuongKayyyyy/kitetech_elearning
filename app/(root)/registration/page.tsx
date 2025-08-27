@@ -1,11 +1,23 @@
 "use client";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import RegisSubjectTable from "@/components/item_list/RegisSubjectTable";
 import FloatingRegisedSubject from "@/components/item_list/FloatingRegisedSubject";
 import RegistedSubjectTable from "@/components/item_list/RegistedSubjectTable";
 import { FakeData } from "@/app/data/FakeData";
 import { Toaster } from "sonner";
 import { BookOpen, GraduationCap, Plus, List } from "lucide-react";
+import { CourseData } from "@/app/data/api/course_data";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function Page() {
   const availableSubjects = CourseData.getCourses();
@@ -16,14 +28,61 @@ export default function Page() {
   const [activeTab, setActiveTab] = useState<"register" | "registered">(
     "register"
   );
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [password, setPassword] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [confirmedSubjects, setConfirmedSubjects] = useState<any[]>([]);
 
-  const registeredSubjects = Array.from(selectedSubjects)
-    .map((id) => availableSubjects.find((subj) => subj.id.toString() === id))
-    .filter(Boolean);
+  const registrableSubjects = useMemo(
+    () =>
+      availableSubjects.filter(
+        (s) => !confirmedSubjects.some((c: any) => c.id === s.id)
+      ),
+    [availableSubjects, confirmedSubjects]
+  );
+
+  const registeredSubjects = useMemo(
+    () =>
+      Array.from(selectedSubjects)
+        .map((id) =>
+          registrableSubjects.find((subj) => subj.id.toString() === id)
+        )
+        .filter(Boolean) as any[],
+    [selectedSubjects, registrableSubjects]
+  );
 
   const handleClear = () => setSelectedSubjects(new Set());
   const handleConfirm = () => {
-    alert("Registration confirmed! (Implement your logic here)");
+    setShowPasswordDialog(true);
+  };
+
+  const handleSubmitRegistration = async () => {
+    if (!password) {
+      toast.error("Please enter your password to confirm.");
+      return;
+    }
+    try {
+      setIsSubmitting(true);
+      await new Promise((r) => setTimeout(r, 800));
+      toast.success("Registration confirmed successfully.");
+      setShowPasswordDialog(false);
+      setPassword("");
+      // Persist selected subjects into confirmed list (unique by id)
+      const toConfirm = Array.from(selectedSubjects)
+        .map((id) =>
+          availableSubjects.find((subj) => subj.id.toString() === id)
+        )
+        .filter(Boolean) as any[];
+      setConfirmedSubjects((prev) => {
+        const existing = new Map(prev.map((c: any) => [c.id, c]));
+        toConfirm.forEach((c) => existing.set(c.id, c));
+        return Array.from(existing.values());
+      });
+      setSelectedSubjects(new Set());
+      setActiveTab("registered");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const semesters = [
@@ -93,9 +152,10 @@ export default function Page() {
                 </div>
 
                 <RegisSubjectTable
-                  availableSubjects={availableSubjects}
+                  availableSubjects={registrableSubjects}
                   selectedSubjects={selectedSubjects}
                   setSelectedSubjects={setSelectedSubjects}
+                  onConfirm={handleConfirm}
                 />
 
                 <FloatingRegisedSubject
@@ -144,7 +204,7 @@ export default function Page() {
                   </div>
                 </div>
 
-                <RegistedSubjectTable />
+                <RegistedSubjectTable registeredSubjects={confirmedSubjects} />
               </div>
             )}
           </div>
@@ -152,6 +212,42 @@ export default function Page() {
       </div>
 
       <Toaster position='bottom-left'></Toaster>
+
+      <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
+        <DialogContent className='sm:max-w-[425px]'>
+          <DialogHeader>
+            <DialogTitle>Confirm Registration</DialogTitle>
+            <DialogDescription>
+              Enter your password to confirm registering selected subjects.
+            </DialogDescription>
+          </DialogHeader>
+          <div className='grid gap-4 py-4'>
+            <div className='grid gap-2'>
+              <label htmlFor='password' className='text-sm font-medium'>
+                Password
+              </label>
+              <Input
+                id='password'
+                type='password'
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder='Your account password'
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant='ghost'
+              onClick={() => setShowPasswordDialog(false)}
+              disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmitRegistration} disabled={isSubmitting}>
+              {isSubmitting ? "Confirming..." : "Confirm"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

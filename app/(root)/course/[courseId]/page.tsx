@@ -13,6 +13,7 @@ import ClassMeetSection from "@/components/item/ClassMeetSection";
 import { toast, Toaster } from "sonner";
 import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
 import ClassScoreTable from "./ClassScoreTable";
+import { CourseData } from "@/app/data/api/course_data";
 interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }

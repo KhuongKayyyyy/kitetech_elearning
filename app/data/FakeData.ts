@@ -1,11 +1,9 @@
 import { UserRole } from "./enum/UserRole";
 import { getStudentsByClass, getTeacherByClass } from "./api/user_data";
 import { CourseData } from "./api/course_data";
+import { useAuthentication } from "@/hooks/useAuthentication";
 
 export class FakeData {
-
-
-
   static getCourseSchedule() {
     return [
       {
@@ -24,7 +22,8 @@ export class FakeData {
   }
 
   static getCurrentUserRole() {
-    return UserRole.TEACHER;
+    const user = useAuthentication();
+    return user.user?.role;
   }
 
   // Get enrolled students for a specific course

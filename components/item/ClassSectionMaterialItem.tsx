@@ -14,6 +14,7 @@ import markdownit from "markdown-it";
 import DOMPurify from "isomorphic-dompurify";
 import router, { useRouter } from "next/navigation";
 import { FakeData } from "@/app/data/FakeData";
+import { CourseData } from "@/app/data/api/course_data";
 
 const md = markdownit();
 

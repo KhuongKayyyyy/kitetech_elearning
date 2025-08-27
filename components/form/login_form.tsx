@@ -28,8 +28,8 @@ import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 
 export default function LoginForm() {
-  const [email, setEmail] = useState("nguyendatkhuong");
-  const [password, setPassword] = useState("datkhuong1123");
+  const [email, setEmail] = useState("12500051");
+  const [password, setPassword] = useState("matkhau123");
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const { login, loading, error } = useAuthentication();
@@ -69,7 +69,7 @@ export default function LoginForm() {
 
         <form onSubmit={handleSubmit}>
           <CardContent className='space-y-8 px-8 py-6'>
-            {(localError || error) && (
+            {/* {(localError || error) && (
               <Alert
                 variant='destructive'
                 className='border-red-200 bg-red-50/90 backdrop-blur-sm rounded-xl animate-in slide-in-from-top-2 duration-300'>
@@ -78,7 +78,7 @@ export default function LoginForm() {
                     (typeof error === "string" ? error : error?.message)}
                 </AlertDescription>
               </Alert>
-            )}
+            )} */}
 
             <div className='space-y-3'>
               <Label

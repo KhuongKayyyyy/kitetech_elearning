@@ -79,6 +79,11 @@ export function AppSidebar() {
           icon: <ListOrdered className='h-5 w-5 flex-shrink-0' />,
         },
         {
+          label: "Score",
+          href: "/score",
+          icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
+        },
+        {
           label: "Registration",
           href: "/registration",
           icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,

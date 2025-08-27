@@ -15,10 +15,12 @@ export default function RegisSubjectTable({
   availableSubjects,
   selectedSubjects,
   setSelectedSubjects,
+  onConfirm,
 }: {
   availableSubjects: any[];
   selectedSubjects: Set<string>;
   setSelectedSubjects: (subjects: Set<string>) => void;
+  onConfirm?: () => void;
 }) {
   const handleRegister = (courseId: string) => {
     const newSelected = new Set(selectedSubjects);
@@ -282,7 +284,9 @@ export default function RegisSubjectTable({
                     total credits
                   </p>
                 </div>
-                <button className='bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/25'>
+                <button
+                  onClick={onConfirm}
+                  className='bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-semibold transition-all duration-200 hover:scale-105 shadow-lg shadow-green-500/25'>
                   Confirm Registration
                 </button>
               </div>

@@ -23,6 +23,7 @@ import AddMaterialItem from "../ui/AddMaterialItem";
 import { toast, Toaster } from "sonner";
 import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 import NameRecognitionDialog from "../dialog/name_recognition_dialog";
+import { UserRole } from "@/app/data/enum/UserRole";
 
 interface ClassSectionItemProps {
   classSection: ClassSectionModel;
@@ -253,7 +254,7 @@ export default function ClassSectionItem({
               <ChevronDown className='h-4 w-4' />
             )}
           </button>
-          {FakeData.getCurrentUserRole() === "teacher" && (
+          {FakeData.getCurrentUserRole() === UserRole.TEACHER && (
             <>
               <button
                 onClick={(e) => {
@@ -315,19 +316,20 @@ export default function ClassSectionItem({
           )}
 
           {/* Add Material Button for Teachers */}
-          {FakeData.getCurrentUserRole() === "teacher" && !isEditMode && (
-            <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setIsAddDocumentMaterialOpen(true);
-                }}
-                className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
-                <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
-                <span className='font-medium'>Add Material</span>
-              </button>
-            </div>
-          )}
+          {FakeData.getCurrentUserRole() === UserRole.TEACHER &&
+            !isEditMode && (
+              <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsAddDocumentMaterialOpen(true);
+                  }}
+                  className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
+                  <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
+                  <span className='font-medium'>Add Material</span>
+                </button>
+              </div>
+            )}
         </>
       )}
 
@@ -353,16 +355,18 @@ export default function ClassSectionItem({
               )}
             </div>
           </div>
-          <NameRecognitionDialog
-            qrCodeValue={JSON.stringify({
-              classId: classSection.id,
-              date: new Date().toISOString(),
-              classSessionID: "sess_abc123",
-              name: classSection.name + classSection.course.name,
-            })}
-            isOpen={isNameRecognitionDialogOpen}
-            onOpenChange={setIsNameRecognitionDialogOpen}
-          />
+          {FakeData.getCurrentUserRole() === UserRole.TEACHER && (
+            <NameRecognitionDialog
+              qrCodeValue={JSON.stringify({
+                classId: classSection.id,
+                date: new Date().toISOString(),
+                classSessionID: "sess_abc123",
+                name: classSection.name + classSection.course.name,
+              })}
+              isOpen={isNameRecognitionDialogOpen}
+              onOpenChange={setIsNameRecognitionDialogOpen}
+            />
+          )}
         </div>
       )}
 

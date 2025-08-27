@@ -1,12 +1,16 @@
-// Student Score Interface and fake data generator
+
 
 import { UserModel, Role } from "../model/UserModel";
 import { classDistribution } from "./user_data";
+import { CourseData } from "./course_data";
 
 export interface StudentScore {
   id: string;
   studentId: number;
   studentName: string;
+  courseId: number;
+  courseCode: string;
+  courseName: string;
   qt1: number | null;
   qt2: number | null;
   midterm: number | null;
@@ -49,34 +53,46 @@ export const generateScoreDataForStudents = (students: UserModel[]): StudentScor
     { qt1: 4, qt2: 3, midterm: 4, finalTerm: 3 }
   ];
   
-  return students.map((student: UserModel, index: number) => {
-    const scoreData = fixedScores[index % fixedScores.length];
-    const qt1 = scoreData.qt1;
-    const qt2 = scoreData.qt2;
-    const midterm = scoreData.midterm;
-    const finalTerm = scoreData.finalTerm;
+  const courses = CourseData.getCourses();
+  
+  return students.flatMap((student: UserModel, studentIndex: number) => {
+    // Each student is enrolled in 2-4 courses randomly
+    const numCourses = Math.floor(Math.random() * 3) + 2; // 2-4 courses
+    const enrolledCourses = courses.slice(0, numCourses);
+    
+    return enrolledCourses.map((course, courseIndex) => {
+      const scoreIndex = (studentIndex * enrolledCourses.length + courseIndex) % fixedScores.length;
+      const scoreData = fixedScores[scoreIndex];
+      const qt1 = scoreData.qt1;
+      const qt2 = scoreData.qt2;
+      const midterm = scoreData.midterm;
+      const finalTerm = scoreData.finalTerm;
 
-    const scores = [qt1, qt2, midterm, finalTerm];
-    const average = Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
+      const scores = [qt1, qt2, midterm, finalTerm];
+      const average = Math.round((scores.reduce((sum, score) => sum + score, 0) / scores.length) * 10) / 10;
 
-    let grade = "N/A";
-    if (average >= 9) grade = "A";
-    else if (average >= 8) grade = "B";
-    else if (average >= 7) grade = "C";
-    else if (average >= 6) grade = "D";
-    else grade = "F";
+      let grade = "N/A";
+      if (average >= 9) grade = "A";
+      else if (average >= 8) grade = "B";
+      else if (average >= 7) grade = "C";
+      else if (average >= 6) grade = "D";
+      else grade = "F";
 
-    return {
-      id: `student-${student.id}`,
-      studentId: student.id,
-      studentName: student.full_name,
-      qt1,
-      qt2,
-      midterm,
-      finalTerm,
-      average,
-      grade,
-    };
+      return {
+        id: `student-${student.id}-course-${course.id}`,
+        studentId: student.id,
+        studentName: student.full_name,
+        courseId: course.id,
+        courseCode: course.code,
+        courseName: course.name,
+        qt1,
+        qt2,
+        midterm,
+        finalTerm,
+        average,
+        grade,
+      };
+    });
   });
 };
 
@@ -113,4 +129,12 @@ export const getScoreDataByClassId = (classId: number): StudentScore[] => {
   return generateScoreDataForClass(classId);
 };
 
+export const getScoresByCourseId = (courseId: number): StudentScore[] => {
+  const allScores = generateFakeScoreData();
+  return allScores.filter(score => score.courseId === courseId);
+};
 
+export const getStudentScoresByCourse = (studentId: number): StudentScore[] => {
+  const allScores = generateFakeScoreData();
+  return allScores.filter(score => score.studentId === studentId);
+};

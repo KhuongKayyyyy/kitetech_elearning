@@ -4,6 +4,7 @@ import React from "react";
 import { FakeData } from "@/app/data/FakeData";
 import { UserRole } from "@/app/data/enum/UserRole";
 import TeacherScorePage from "./teacher_score_page";
+import StudentScorePage from "./student_score_page";
 
 export default function page() {
   const userRole = FakeData.getCurrentUserRole();
@@ -11,6 +12,12 @@ export default function page() {
     return (
       <div className='p-6'>
         <TeacherScorePage />
+      </div>
+    );
+  } else if (userRole === UserRole.STUDENT) {
+    return (
+      <div className='p-6'>
+        <StudentScorePage />
       </div>
     );
   }

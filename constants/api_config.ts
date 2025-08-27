@@ -10,4 +10,12 @@ export const API_CONFIG = {
     ADD_ACADEMIC_YEAR: "/api/academic-years",
     UPDATE_ACADEMIC_YEAR: (id: string) => `/api/academic-years/${id}`,
     DELETE_ACADEMIC_YEAR: (id: string) => `/api/academic-years/${id}`,
+
+
+    // Class
+    GET_CLASSES: "/api/classrooms/my-classrooms ",
+    GET_CLASS: (id: string) => `/api/classes/${id}`,
+    ADD_CLASS: "/api/classes",
+    UPDATE_CLASS: (id: string) => `/api/classes/${id}`,
+    DELETE_CLASS: (id: string) => `/api/classes/${id}`,
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { CourseData } from "@/app/data/api/course_data";
 import { FakeData } from "@/app/data/FakeData";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
