@@ -3,4 +3,5 @@ interface ClassSectionModel {
   course: Course;
   section: number;
   name: string;
+  posts?: ClassSectionMaterialModel[];
 }

@@ -27,9 +27,9 @@ export default function CourseSectionMap({
         Course Sections
       </h3>
       <div className='grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 xl:grid-cols-3 gap-2 sm:gap-3'>
-        {classSession.map((section) => (
+        {classSession.map((section, index) => (
           <button
-            key={section.id}
+            key={`section-${section.id}-${index}`}
             onClick={() => handleSectionClick(section.id)}
             className={`
               relative p-2 sm:p-3 rounded-lg border-2 transition-all duration-200 text-center min-h-[60px] sm:min-h-[70px]

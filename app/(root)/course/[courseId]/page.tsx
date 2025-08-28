@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FakeData } from "@/app/data/FakeData";
 import CourseBriefInformation from "./CourseBriefInformation";
 import AddSectionButton from "./AddSectionButton";
@@ -13,7 +13,11 @@ import ClassMeetSection from "@/components/item/ClassMeetSection";
 import { toast, Toaster } from "sonner";
 import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
 import ClassScoreTable from "./ClassScoreTable";
-import { CourseData } from "@/app/data/api/course_data";
+import { classSessionService } from "@/app/data/services/classSessionService";
+import { useAuthentication } from "@/hooks/useAuthentication";
+import { UserRole } from "@/app/data/enum/UserRole";
+import { classSectionMaterialService } from "@/app/data/services/classSectionMaterialService";
+
 interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }
@@ -21,14 +25,12 @@ interface CoursePageProps {
 export default function Page({ params }: CoursePageProps) {
   const actualParams = React.use(params);
 
-  const course = CourseData.getCourses().find(
-    (c) => c.id === parseInt(actualParams.courseId)
-  );
-
-  // Load initial class sections
+  // Load initial class sessions
   const [classSections, setClassSections] = useState(() =>
     FakeData.getClassSections()
   );
+
+  const [isLoading, setIsLoading] = useState(true);
 
   const [activeTab, setActiveTab] = useState<CourseTabEnum>(
     CourseTabEnum.STREAM
@@ -37,7 +39,56 @@ export default function Page({ params }: CoursePageProps) {
   const [isAddSectionModalOpen, setIsAddSectionModalOpen] = useState(false);
   const [newSectionName, setNewSectionName] = useState("");
 
-  const userRole = FakeData.getCurrentUserRole();
+  const { user } = useAuthentication();
+  const isTeacher = (user?.role as string) === UserRole.TEACHER;
+
+  // Fetch class sessions from service
+  useEffect(() => {
+    const fetchClassSessions = async () => {
+      if (actualParams.courseId) {
+        try {
+          setIsLoading(true);
+          const data = await classSessionService.getClassSessions(
+            actualParams.courseId
+          );
+
+          setClassSections(data);
+        } catch (error) {
+          console.error("Failed to fetch class sessions:", error);
+          // Fall back to fake data if service fails
+          setClassSections(FakeData.getClassSections());
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchClassSessions();
+  }, [actualParams.courseId]);
+
+  const course = classSections[0]?.course;
+
+  const [classSectionWithMaterials, setClassSectionWithMaterials] = useState(
+    []
+  );
+
+  useEffect(() => {
+    const fetchClassSectionWithMaterials = async () => {
+      try {
+        const data = await classSessionService.getClassDetail(
+          actualParams.courseId
+        );
+        console.log("Class section with materials:", data);
+        setClassSectionWithMaterials(data);
+      } catch (error) {
+        console.error("Failed to fetch class section details:", error);
+      }
+    };
+
+    if (actualParams.courseId) {
+      fetchClassSectionWithMaterials();
+    }
+  }, [actualParams.courseId]);
 
   const handleAddSection = () => {
     setIsAddSectionModalOpen(true);
@@ -69,12 +120,19 @@ export default function Page({ params }: CoursePageProps) {
     return <div className='p-4 text-center'>Course not found</div>;
   }
 
+  if (isLoading) {
+    return <div className='p-4 text-center'>Loading class sessions...</div>;
+  }
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "stream":
         return (
           <div className='w-full flex-1'>
-            <ClassSectionList classSections={classSections} />
+            <ClassSectionList
+              classSections={classSectionWithMaterials}
+              course={course}
+            />
             <div className='w-full mt-4 mb-8'>
               <AddSectionButton onAddSection={handleAddSection} />
             </div>
@@ -114,9 +172,11 @@ export default function Page({ params }: CoursePageProps) {
             <CourseProcess />
             <CourseSectionMap
               classSession={classSections}
-              currentSectionId={classSections[0].id}
+              currentSectionId={classSections[0]?.id}
             />
-            <CourseFileSection />
+            <CourseFileSection
+              classSectionId={classSections[0]?.id.toString()}
+            />
           </div>
 
           {/* Tab Navigation */}
@@ -131,7 +191,7 @@ export default function Page({ params }: CoursePageProps) {
                 }`}>
                 Stream
               </button>
-              {userRole === "teacher" ? (
+              {isTeacher ? (
                 <>
                   <button
                     onClick={() => setActiveTab(CourseTabEnum.PEOPLE)}
@@ -189,10 +249,10 @@ export default function Page({ params }: CoursePageProps) {
           <div className='mt-6'></div>
           <CourseSectionMap
             classSession={classSections}
-            currentSectionId={classSections[0].id}
+            currentSectionId={classSections[0]?.id}
           />
           <div className='mt-6'></div>
-          <CourseFileSection />
+          <CourseFileSection classSectionId={classSections[0]?.id.toString()} />
         </aside>
       </div>
 

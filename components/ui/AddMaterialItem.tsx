@@ -29,6 +29,7 @@ import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 interface AddDocumentMaterialProps {
   type?: ClassAssignmentEnum;
   open: boolean;
+  classSectionId: string;
   onOpenChange: (open: boolean) => void;
   onSave: (materialData: {
     title: string;
@@ -37,12 +38,14 @@ interface AddDocumentMaterialProps {
     link?: string;
     deadline?: string;
     type: ClassAssignmentEnum;
+    classSectionId: string;
   }) => void;
 }
 
 export default function AddMaterialItem({
   type,
   open,
+  classSectionId,
   onOpenChange,
   onSave,
 }: AddDocumentMaterialProps) {
@@ -123,6 +126,7 @@ export default function AddMaterialItem({
           ? deadline
           : undefined,
       type: materialType,
+      classSectionId: classSectionId,
     });
 
     // Reset form

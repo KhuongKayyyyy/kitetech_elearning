@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useId, useMemo, useRef, useState } from "react";
+import React, { useId, useMemo, useRef, useState, useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -34,11 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  StudentScore,
-  getScoreDataByClassId,
-  getStudentScores,
-} from "@/app/data/api/score_data";
 import { EditStudentScoreDialog } from "./EditStudentScoreDialog";
 import { cn } from "@/lib/utils";
 import {
@@ -68,7 +63,40 @@ import {
   Edit,
   Search,
 } from "lucide-react";
-import { FakeData } from "@/app/data/FakeData";
+import { classService } from "@/app/data/services/classService";
+import { toast } from "sonner";
+
+// Type definitions for the service dataex
+export interface GradeData {
+  id: number;
+  classroomId: number;
+  userId: number;
+  qt1Grade: string;
+  qt2Grade: string;
+  midtermGrade: string;
+  finalGrade: string;
+  createdAt: string;
+  updatedAt: string;
+  user: {
+    id: number;
+    username: string;
+    full_name: string;
+    email: string;
+  };
+}
+
+export interface StudentScore {
+  id: number;
+  studentName: string;
+  studentId: string;
+  userId: number;
+  email: string;
+  qt1: number | null;
+  qt2: number | null;
+  midterm: number | null;
+  finalTerm: number | null;
+  average: number | null;
+}
 
 // Custom filter function for multi-column searching
 const multiColumnFilterFn: FilterFn<StudentScore> = (row, filterValue) => {
@@ -98,12 +126,8 @@ interface ClassScoreTableProps {
 }
 
 export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
-  // Memoize students and scores to prevent unnecessary recalculations
-  const students = useMemo(
-    () => FakeData.getEnrolledStudentsForCourse(courseId),
-    [courseId]
-  );
-  const studentScores = useMemo(() => getStudentScores(students), [students]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [classGrades, setClassGrades] = useState<GradeData[]>([]);
 
   const id = useId();
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -121,14 +145,62 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
     },
   ]);
 
-  // Memoize the data to prevent unnecessary recalculations
-  const data = useMemo(() => {
-    if (studentScores) {
-      return studentScores;
-    } else {
-      return getScoreDataByClassId(courseId);
-    }
-  }, [studentScores, courseId]);
+  // Fetch grades data from service
+  useEffect(() => {
+    const fetchClassGrades = async () => {
+      try {
+        setIsLoading(true);
+        const gradesData = await classService.getClassGrades(
+          courseId.toString()
+        );
+        setClassGrades(gradesData);
+      } catch (error) {
+        console.error("Failed to fetch class grades:", error);
+        setClassGrades([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchClassGrades();
+  }, [courseId]);
+
+  // Transform service data to table format
+  const data = useMemo((): StudentScore[] => {
+    return classGrades.map((gradeData: GradeData) => {
+      const userId = gradeData.userId;
+      const qt1 = gradeData.qt1Grade ? parseFloat(gradeData.qt1Grade) : null;
+      const qt2 = gradeData.qt2Grade ? parseFloat(gradeData.qt2Grade) : null;
+      const midterm = gradeData.midtermGrade
+        ? parseFloat(gradeData.midtermGrade)
+        : null;
+      const finalTerm = gradeData.finalGrade
+        ? parseFloat(gradeData.finalGrade)
+        : null;
+
+      // Calculate average
+      const scores = [qt1, qt2, midterm, finalTerm].filter(
+        (score): score is number => score !== null
+      );
+      const average =
+        scores.length > 0
+          ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+          : null;
+
+      return {
+        id: gradeData.id,
+        userId: userId,
+        studentName: gradeData.user.full_name,
+        studentId: gradeData.user.username,
+        email: gradeData.user.email,
+        qt1,
+        qt2,
+        midterm,
+        finalTerm,
+        average: average ? Math.round(average * 100) / 100 : null,
+      };
+    });
+  }, [classGrades]);
 
   const [editingStudent, setEditingStudent] = useState<StudentScore | null>(
     null
@@ -137,13 +209,45 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
 
   const handleEditStudent = (student: StudentScore) => {
     setEditingStudent(student);
+
     setIsEditDialogOpen(true);
   };
 
-  const handleSaveStudent = (updatedStudent: StudentScore) => {
-    // Since we're using memoized data, we need to handle updates differently
-    // For now, we'll just close the dialog and let the parent component handle updates
-    handleCloseEditDialog();
+  const handleSaveStudent = async (updatedStudent: StudentScore) => {
+    try {
+      console.log("updatedStudent", updatedStudent);
+      await classService.updateClassGrade(
+        courseId.toString(),
+        updatedStudent.userId.toString(),
+        {
+          qt1Grade: updatedStudent.qt1,
+          qt2Grade: updatedStudent.qt2,
+          midtermGrade: updatedStudent.midterm,
+          finalGrade: updatedStudent.finalTerm,
+        }
+      );
+
+      // Update local state with the new data
+      setClassGrades((prevGrades) =>
+        prevGrades.map((gradeData) =>
+          gradeData.userId === updatedStudent.userId
+            ? {
+                ...gradeData,
+                qt1Grade: updatedStudent.qt1?.toString() || "",
+                qt2Grade: updatedStudent.qt2?.toString() || "",
+                midtermGrade: updatedStudent.midterm?.toString() || "",
+                finalGrade: updatedStudent.finalTerm?.toString() || "",
+              }
+            : gradeData
+        )
+      );
+
+      toast.success("Student score updated successfully");
+      handleCloseEditDialog();
+    } catch (error) {
+      console.error("Failed to update student score:", error);
+      toast.error("Failed to update student score");
+    }
   };
 
   const handleCloseEditDialog = () => {
@@ -272,6 +376,16 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
       inputRef.current.focus();
     }
   };
+
+  if (isLoading) {
+    return (
+      <div className='space-y-6'>
+        <div className='flex items-center justify-center h-32'>
+          <div className='text-muted-foreground'>Loading class scores...</div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className='space-y-6'>

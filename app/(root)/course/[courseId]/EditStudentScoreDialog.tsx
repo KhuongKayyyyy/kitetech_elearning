@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { StudentScore } from "@/app/data/api/score_data";
+import { StudentScore } from "./ClassScoreTable";
 
 interface EditStudentScoreDialogProps {
   isOpen: boolean;
@@ -91,7 +91,6 @@ export function EditStudentScoreDialog({
       midterm,
       finalTerm,
       average,
-      grade,
     };
 
     onSave(updatedStudent);

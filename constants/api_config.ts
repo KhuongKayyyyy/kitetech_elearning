@@ -14,8 +14,23 @@ export const API_CONFIG = {
 
     // Class
     GET_CLASSES: "/api/classrooms/my-classrooms ",
-    GET_CLASS: (id: string) => `/api/classes/${id}`,
+    GET_CLASS_SESSIONS: (id: string) => `/api/classrooms/my-classrooms/${id}`,
+    GET_CLASS_DETAIL: (id: string) => `/api/classrooms/${id}/posts-by-session`,
+    GET_CLASS_POST: (id: string) => `/api/classrooms/${id}/posts`,
     ADD_CLASS: "/api/classes",
     UPDATE_CLASS: (id: string) => `/api/classes/${id}`,
     DELETE_CLASS: (id: string) => `/api/classes/${id}`,
+    GET_CLASS_MEMBERS: (id: string) => `/api/classrooms/${id}/members`,
+    GET_CLASS_GRADES: (id: string) => `/api/classrooms/${id}/grades`,
+
+    // Class Section material:
+    CREATE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/${id}/posts`,
+    GET_CLASS_FILES: (id: string) => `/api/classrooms/${id}/files`,
+    UPDATE_CLASS_GRADE: (id: string,studentId:string) => `/api/classrooms/${id}/grades/${studentId}`,
+    // ADD_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials`,
+    // UPDATE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials/${id}`,
+    // DELETE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials/${id}`,
+
+
+
 }

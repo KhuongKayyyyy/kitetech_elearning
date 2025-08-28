@@ -1,58 +1,69 @@
 import React, { useState, useEffect } from "react";
 import { Users } from "lucide-react";
 import PeopleInClassItem from "@/components/item/PeopleInClassItem";
-import { UserModel } from "@/app/data/model/UserModel";
-import { FakeData } from "@/app/data/FakeData";
+import { classRepository } from "@/app/data/respository/classRepository";
 
 interface PeopleInClassListProps {
   courseId: number;
+}
+
+interface ClassMember {
+  id: number;
+  user_id: number;
+  role: "Teacher" | "Student";
+  joined_at: string;
+  is_active: boolean;
+  user: {
+    id: number;
+    username: string;
+    full_name: string;
+    email: string;
+  };
 }
 
 export default function PeopleInClassList({
   courseId,
 }: PeopleInClassListProps) {
   const [isLoading, setIsLoading] = useState(true);
+  const [classMembers, setClassMembers] = useState<ClassMember[]>([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
+    const fetchClassMembers = async () => {
+      try {
+        setIsLoading(true);
+        const response = await classRepository.getClassMembers(
+          courseId.toString()
+        );
+        setClassMembers(response.data);
+      } catch (error) {
+        console.error("Failed to fetch class members:", error);
+        setClassMembers([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-    return () => clearTimeout(timer);
-  }, []);
+    fetchClassMembers();
+  }, [courseId]);
 
-  const classStudents = FakeData.getEnrolledStudentsForCourse(courseId);
-  const classTeacher = FakeData.getTeacherForCourse(courseId);
-
-  // Transform students to match expected format
-  const transformedStudents = classStudents.map((student: UserModel) => ({
-    id: student.id,
-    name: student.full_name,
-    email: student.email,
-    role: "student" as const,
-    avatar: student.avatar,
+  // Transform class members to match expected format
+  const transformedMembers = classMembers.map((member: ClassMember) => ({
+    id: member.user.id,
+    name: member.user.full_name,
+    email: member.user.email,
+    role: member.role.toLowerCase() as "teacher" | "student",
+    avatar: null, // No avatar in API response
     phone: "",
-    status: student.isActive ? ("online" as const) : ("offline" as const),
+    status: member.is_active ? ("online" as const) : ("offline" as const),
   }));
 
-  // Transform teacher to match expected format
-  const transformedTeacher = classTeacher
-    ? {
-        id: classTeacher.id,
-        name: classTeacher.full_name,
-        email: classTeacher.email,
-        role: "teacher" as const,
-        avatar: classTeacher.avatar,
-        phone: "",
-        status: classTeacher.isActive
-          ? ("online" as const)
-          : ("offline" as const),
-      }
-    : null;
-
   // Separate teachers and students
-  const teachers = transformedTeacher ? [transformedTeacher] : [];
-  const students = transformedStudents;
+  const teachers = transformedMembers.filter(
+    (member) => member.role === "teacher"
+  );
+  const students = transformedMembers.filter(
+    (member) => member.role === "student"
+  );
 
   const handleMessage = (person: any) => {
     console.log("Messaging:", person);

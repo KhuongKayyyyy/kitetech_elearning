@@ -14,33 +14,35 @@ import {
   ChevronUp,
   QrCode,
 } from "lucide-react";
-import { FakeData } from "@/app/data/FakeData";
+import { useAuthentication } from "@/hooks/useAuthentication";
 import ClassSectionMaterialItem from "./ClassSectionMaterialItem";
 import { useRouter } from "next/navigation";
 import ClassSectionMaterialRearrangableList from "../item_list/ClassSectionMaterialRearrangableList";
-import { Button } from "../ui/button";
 import AddMaterialItem from "../ui/AddMaterialItem";
 import { toast, Toaster } from "sonner";
 import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 import NameRecognitionDialog from "../dialog/name_recognition_dialog";
 import { UserRole } from "@/app/data/enum/UserRole";
+import { classSectionMaterialService } from "@/app/data/services/classSectionMaterialService";
 
 interface ClassSectionItemProps {
   classSection: ClassSectionModel;
   onDeleteSection?: (sectionId: number) => void;
   defaultExpanded?: boolean;
+  course?: Course;
 }
 
 export default function ClassSectionItem({
   classSection,
   onDeleteSection,
   defaultExpanded = false,
+  course,
 }: ClassSectionItemProps) {
-  const [classSectionMaterials, setClassSectionMaterials] = useState(
-    FakeData.getClassSectionMaterial().filter(
-      (material) => material.classSectionId === classSection.id
-    )
-  );
+  const [classSectionMaterials, setClassSectionMaterials] = useState<
+    ClassSectionMaterialModel[]
+  >(classSection.posts || []);
+  const { user } = useAuthentication();
+  const isTeacher = (user?.role as string) === UserRole.TEACHER;
   const router = useRouter();
   const [isEditMode, setIsEditMode] = useState(false);
   const [editedName, setEditedName] = useState(classSection.name);
@@ -50,6 +52,10 @@ export default function ClassSectionItem({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const [isNameRecognitionDialogOpen, setIsNameRecognitionDialogOpen] =
     useState(false);
+  // Keep materials in sync when parent updates (e.g., after API fetch)
+  useEffect(() => {
+    setClassSectionMaterials(classSection.posts || []);
+  }, [classSection.posts]);
 
   // Add scroll effect for section jumping
   useEffect(() => {
@@ -62,30 +68,23 @@ export default function ClassSectionItem({
             behavior: "smooth",
             block: "start",
           });
-          // Add a brief highlight effect
           element.style.boxShadow = "0 0 0 3px rgba(59, 130, 246, 0.3)";
           setTimeout(() => {
             element.style.boxShadow = "";
           }, 2000);
-          // Auto-expand when navigating to section
           setIsExpanded(true);
         }
       }
     };
 
-    // Handle initial load
     handleHashChange();
-
-    // Listen for hash changes
     window.addEventListener("hashchange", handleHashChange);
-
     return () => {
       window.removeEventListener("hashchange", handleHashChange);
     };
   }, [classSection.id]);
 
   const handleSaveName = () => {
-    // TODO: Implement save name functionality
     console.log("Save name:", editedName);
     setIsEditingName(false);
   };
@@ -101,7 +100,7 @@ export default function ClassSectionItem({
     }
   };
 
-  const handleAddDocumentMaterial = (materialData: {
+  const handleAddDocumentMaterial = async (materialData: {
     title: string;
     description?: string;
     file?: File;
@@ -109,68 +108,85 @@ export default function ClassSectionItem({
     deadline?: string;
     type: ClassAssignmentEnum;
   }) => {
-    // Handle empty array case for ID generation
-    const currentIds = classSectionMaterials.map((m) => m.id);
-    const maxId = currentIds.length > 0 ? Math.max(...currentIds) : 0;
+    console.log("Class section id:", classSection.id);
+    console.log("Material data:", materialData);
+    try {
+      const createdMaterial =
+        await classSectionMaterialService.createClassSectionMaterial(
+          String(course?.id),
+          {
+            ...materialData,
+            classSectionId: String(classSection.id),
+          }
+        );
 
-    // Create new material with unique ID
-    const newMaterial = {
-      id: maxId + 1,
-      classSectionId: classSection.id,
-      material: materialData.title,
-      type: materialData.type,
-      content: materialData.description || "",
-      link: materialData.link,
-      deadline: materialData.deadline,
-    };
+      // Update local state with the response
+      setClassSectionMaterials((prev) => [...prev, createdMaterial]);
 
-    // Update the materials state
-    setClassSectionMaterials((prev) => {
-      const updated = [...prev, newMaterial];
-      console.log("Updated materials array:", updated);
-      return updated;
-    });
-
-    // Print out detailed information of new material added
-    console.log("=== New Material Added ===");
-    console.log("Title:", materialData.title);
-    console.log("Description:", materialData.description);
-    console.log("Type:", materialData.type);
-
-    if (materialData.link) {
-      console.log("Link:", materialData.link);
+      toast.success("Material added successfully");
+      setIsAddDocumentMaterialOpen(false);
+    } catch (error) {
+      console.error("Failed to add material:", error);
+      toast.error("Failed to add material");
     }
-
-    if (materialData.deadline) {
-      console.log("Deadline:", materialData.deadline);
-    }
-
-    if (materialData.file) {
-      console.log("File Information:");
-      console.log("  - Name:", materialData.file.name);
-      console.log("  - Size:", materialData.file.size, "bytes");
-      console.log("  - Type:", materialData.file.type);
-      console.log(
-        "  - Last Modified:",
-        new Date(materialData.file.lastModified).toISOString()
-      );
-    } else {
-      console.log("No file attached");
-    }
-
-    console.log("Added at:", new Date().toISOString());
-    console.log("Section ID:", classSection.id);
-    console.log("Section Name:", classSection.name);
-    console.log("New Material ID:", newMaterial.id);
-    console.log("Current materials count:", classSectionMaterials.length);
-    console.log("========================");
-
-    // Show success toast
-    toast.success("Material added successfully");
-
-    // Close the modal
-    setIsAddDocumentMaterialOpen(false);
   };
+
+  // const handleAddDocumentMaterial = (materialData: {
+  //   title: string;
+  //   description?: string;
+  //   file?: File;
+  //   link?: string;
+  //   deadline?: string;
+  //   type: ClassAssignmentEnum;
+  // }) => {
+  //   const currentIds = classSectionMaterials.map((m) => m.id);
+  //   const maxId = currentIds.length > 0 ? Math.max(...currentIds) : 0;
+
+  //   const newMaterial = {
+  //     id: maxId + 1,
+  //     classSectionId: classSection.id,
+  //     material: materialData.title,
+  //     type: materialData.type,
+  //     content: materialData.description || "",
+  //     link: materialData.link,
+  //     deadline: materialData.deadline,
+  //   } as unknown as ClassSectionMaterialModel;
+
+  //   setClassSectionMaterials((prev) => {
+  //     const updated = [...prev, newMaterial];
+  //     console.log("Updated materials array:", updated);
+  //     return updated;
+  //   });
+
+  //   console.log("=== New Material Added ===");
+  //   console.log("Title:", materialData.title);
+  //   console.log("Description:", materialData.description);
+  //   console.log("Type:", materialData.type);
+  //   if (materialData.link) console.log("Link:", materialData.link);
+  //   if (materialData.deadline) console.log("Deadline:", materialData.deadline);
+  //   if (materialData.file) {
+  //     console.log("File Information:");
+  //     console.log("  - Name:", materialData.file.name);
+  //     console.log("  - Size:", materialData.file.size, "bytes");
+  //     console.log("  - Type:", materialData.file.type);
+  //     console.log(
+  //       "  - Last Modified:",
+  //       new Date(materialData.file.lastModified).toISOString()
+  //     );
+  //   } else {
+  //     console.log("No file attached");
+  //   }
+
+  //   console.log("Added at:", new Date().toISOString());
+  //   console.log("Section ID:", classSection.id);
+  //   console.log("Section Name:", classSection.name);
+  //   console.log("New Material ID:", newMaterial.id);
+  //   console.log("Current materials count:", classSectionMaterials.length);
+  //   console.log("========================");
+
+  //   toast.success("Material added successfully");
+  //   setIsAddDocumentMaterialOpen(false);
+  // };
 
   const toggleExpanded = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -254,7 +270,7 @@ export default function ClassSectionItem({
               <ChevronDown className='h-4 w-4' />
             )}
           </button>
-          {FakeData.getCurrentUserRole() === UserRole.TEACHER && (
+          {isTeacher && (
             <>
               <button
                 onClick={(e) => {
@@ -292,11 +308,9 @@ export default function ClassSectionItem({
             <ClassSectionMaterialRearrangableList
               initialMaterials={classSectionMaterials}
               onAddMaterial={() => {
-                // TODO: Implement add material functionality
                 console.log("Add material clicked");
               }}
               onRemoveMaterial={(materialId) => {
-                // TODO: Implement remove material functionality
                 console.log("Remove material clicked", materialId);
               }}
             />
@@ -316,20 +330,19 @@ export default function ClassSectionItem({
           )}
 
           {/* Add Material Button for Teachers */}
-          {FakeData.getCurrentUserRole() === UserRole.TEACHER &&
-            !isEditMode && (
-              <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setIsAddDocumentMaterialOpen(true);
-                  }}
-                  className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
-                  <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
-                  <span className='font-medium'>Add Material</span>
-                </button>
-              </div>
-            )}
+          {isTeacher && !isEditMode && (
+            <div className='mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700'>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsAddDocumentMaterialOpen(true);
+                }}
+                className='w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-neutral-300 dark:border-neutral-600 hover:border-primary dark:hover:border-primary rounded-lg text-sm text-neutral-600 dark:text-neutral-400 hover:text-primary dark:hover:text-primary transition-all duration-200 group/add'>
+                <Plus className='h-4 w-4 group-hover/add:scale-110 transition-transform duration-200' />
+                <span className='font-medium'>Add Material</span>
+              </button>
+            </div>
+          )}
         </>
       )}
 
@@ -355,13 +368,13 @@ export default function ClassSectionItem({
               )}
             </div>
           </div>
-          {FakeData.getCurrentUserRole() === UserRole.TEACHER && (
+          {isTeacher && (
             <NameRecognitionDialog
               qrCodeValue={JSON.stringify({
                 classId: classSection.id,
                 date: new Date().toISOString(),
                 classSessionID: "sess_abc123",
-                name: classSection.name + classSection.course.name,
+                name: classSection.name + " - " + course?.name,
               })}
               isOpen={isNameRecognitionDialogOpen}
               onOpenChange={setIsNameRecognitionDialogOpen}
@@ -372,17 +385,19 @@ export default function ClassSectionItem({
 
       {/* add dialog */}
       <AddMaterialItem
+        classSectionId={String(classSection.id)}
         open={isAddDocumentMaterialOpen}
         onOpenChange={setIsAddDocumentMaterialOpen}
         onSave={(materialData) => {
-          if (materialData.description && materialData.type) {
-            handleAddDocumentMaterial({
-              title: materialData.title,
-              description: materialData.description,
-              file: materialData.file,
-              type: materialData.type,
-            });
-          }
+          handleAddDocumentMaterial({
+            title: materialData.title,
+            description: materialData.description,
+            file: materialData.file,
+            type: materialData.type,
+          });
+          // if (materialData.description && materialData.type) {
+
+          //   }
         }}
       />
 

@@ -1,73 +1,86 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FakeData } from "@/app/data/FakeData";
 import CourseFileItem from "../item/CourseFileItem";
 import { FileText, Upload, Image, Video, File } from "lucide-react";
 import AddMaterialItem from "../ui/AddMaterialItem";
 import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
+import { classSectionMaterialService } from "@/app/data/services/classSectionMaterialService";
 
 type FileCategory = "all" | "images" | "videos" | "files";
 
-export default function CourseFileSection() {
+interface CourseFileSectionProps {
+  classSectionId: string;
+}
+
+interface FileData {
+  postId: number;
+  postType: string;
+  postMaterial: string;
+  postContent: string;
+  postDeadline: string | null;
+  postCreatedAt: string;
+  file: {
+    filename: string;
+    originalName: string;
+    fileUrl: string;
+    fileSize: number;
+    mimeType: string;
+    uploadedAt: string;
+    objectName: string;
+    downloadUrl: string;
+  };
+}
+
+interface ApiResponse {
+  classroomId: number;
+  totalFiles: number;
+  files: FileData[];
+}
+
+export default function CourseFileSection({
+  classSectionId,
+}: CourseFileSectionProps) {
   const [isUploadFileModalOpen, setIsUploadFileModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>("all");
+  const [courseFiles, setCourseFiles] = useState<FileData[]>([]);
 
-  const courseFiles = [
-    {
-      id: 1,
-      name: "Course Syllabus.pdf",
-      type: "pdf",
-      size: "2.4 MB",
-      uploadDate: "2024-01-15",
-      url: "#",
-    },
-    {
-      id: 2,
-      name: "Lecture Notes - Week 1.docx",
-      type: "document",
-      size: "1.8 MB",
-      uploadDate: "2024-01-16",
-      url: "#",
-    },
-    {
-      id: 3,
-      name: "Assignment Template.pdf",
-      type: "pdf",
-      size: "856 KB",
-      uploadDate: "2024-01-17",
-      url: "#",
-    },
-    {
-      id: 4,
-      name: "Introduction Video.mp4",
-      type: "video",
-      size: "45.2 MB",
-      uploadDate: "2024-01-18",
-      url: "#",
-    },
-    {
-      id: 5,
-      name: "Sample Code.zip",
-      type: "archive",
-      size: "3.7 MB",
-      uploadDate: "2024-01-19",
-      url: "#",
-    },
-    {
-      id: 6,
-      name: "Diagram Examples.png",
-      type: "image",
-      size: "1.2 MB",
-      uploadDate: "2024-01-20",
-      url: "#",
-    },
-  ];
+  useEffect(() => {
+    const fetchCourseFiles = async () => {
+      try {
+        const response: ApiResponse =
+          await classSectionMaterialService.getClassSectionFiles(
+            classSectionId
+          );
+        console.log("files", response);
+        setCourseFiles(Array.isArray(response.files) ? response.files : []);
+      } catch (error) {
+        console.error("Error fetching course files:", error);
+        setCourseFiles([]);
+      }
+    };
+    fetchCourseFiles();
+  }, [classSectionId]);
+
+  // Helper function to categorize files based on MIME type
+  const categorizeFile = (file: FileData) => {
+    const mimeType = file.file.mimeType.toLowerCase();
+
+    if (mimeType.startsWith("image/")) {
+      return "image";
+    } else if (mimeType.startsWith("video/")) {
+      return "video";
+    } else {
+      return "file";
+    }
+  };
+
+  // Ensure courseFiles is an array before filtering
+  const safeFiles = Array.isArray(courseFiles) ? courseFiles : [];
 
   // Categorize files
-  const images = courseFiles.filter((file) => file.type === "image");
-  const videos = courseFiles.filter((file) => file.type === "video");
-  const files = courseFiles.filter(
-    (file) => !["image", "video"].includes(file.type)
-  );
+  const images = safeFiles.filter((file) => categorizeFile(file) === "image");
+  const videos = safeFiles.filter((file) => categorizeFile(file) === "video");
+  const files = safeFiles.filter((file) => categorizeFile(file) === "file");
 
   // Get filtered files based on selected category
   const getFilteredFiles = () => {
@@ -79,27 +92,34 @@ export default function CourseFileSection() {
       case "files":
         return files;
       default:
-        return courseFiles;
+        return safeFiles;
     }
   };
 
   const filteredFiles = getFilteredFiles();
 
-  const handleViewFile = (file: any) => {
+  const handleViewFile = (file: FileData) => {
     console.log("Viewing file:", file);
-    // TODO: Implement file viewer
+    // Open file URL in new tab
+    window.open(file.file.fileUrl, "_blank");
   };
 
-  const handleDownloadFile = (file: any) => {
+  const handleDownloadFile = (file: FileData) => {
     console.log("Downloading file:", file);
-    // TODO: Implement file download
+    // Create a download link
+    const link = document.createElement("a");
+    link.href = file.file.fileUrl;
+    link.download = file.file.originalName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   const categories = [
     {
       id: "all" as FileCategory,
       label: "All",
-      count: courseFiles.length,
+      count: safeFiles.length,
       icon: <FileText className='h-4 w-4' />,
     },
     {
@@ -122,6 +142,22 @@ export default function CourseFileSection() {
     },
   ];
 
+  // Transform API data to match CourseFileItem expected format
+  const transformFileData = (file: FileData) => {
+    return {
+      id: file.postId,
+      name: file.file.originalName,
+      type: categorizeFile(file),
+      size: (file.file.fileSize / (1024 * 1024)).toFixed(2) + " MB",
+      uploadDate: new Date(file.file.uploadedAt).toLocaleDateString(),
+      url: file.file.fileUrl,
+      mimeType: file.file.mimeType,
+      downloadUrl: file.file.downloadUrl,
+      postMaterial: file.postMaterial,
+      postContent: file.postContent,
+    };
+  };
+
   return (
     <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 shadow-sm overflow-hidden'>
       {/* Header */}
@@ -136,7 +172,7 @@ export default function CourseFileSection() {
                 Course Files
               </h3>
               <p className='text-sm text-neutral-500 dark:text-neutral-400'>
-                {courseFiles.length} files available
+                {safeFiles.length} files available
               </p>
             </div>
           </div>
@@ -187,16 +223,16 @@ export default function CourseFileSection() {
           <div className='bg-white dark:bg-neutral-800'>
             {filteredFiles.map((file, index) => (
               <div
-                key={file.id}
+                key={file.postId}
                 className={`${
                   index !== filteredFiles.length - 1
                     ? "border-b border-neutral-100 dark:border-neutral-700"
                     : ""
                 }`}>
                 <CourseFileItem
-                  file={file}
-                  onView={handleViewFile}
-                  onDownload={handleDownloadFile}
+                  file={transformFileData(file)}
+                  onView={() => handleViewFile(file)}
+                  onDownload={() => handleDownloadFile(file)}
                 />
               </div>
             ))}
@@ -222,9 +258,27 @@ export default function CourseFileSection() {
       </div>
 
       <AddMaterialItem
+        classSectionId={classSectionId}
         open={isUploadFileModalOpen}
         onOpenChange={setIsUploadFileModalOpen}
-        onSave={handleViewFile}
+        onSave={() => {
+          // Refresh files after upload
+          const fetchCourseFiles = async () => {
+            try {
+              const response: ApiResponse =
+                await classSectionMaterialService.getClassSectionFiles(
+                  classSectionId
+                );
+              setCourseFiles(
+                Array.isArray(response.files) ? response.files : []
+              );
+            } catch (error) {
+              console.error("Error refreshing course files:", error);
+              setCourseFiles([]);
+            }
+          };
+          fetchCourseFiles();
+        }}
         type={ClassAssignmentEnum.DOCUMENT}
       />
     </div>
