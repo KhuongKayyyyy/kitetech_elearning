@@ -62,4 +62,15 @@ export const classSectionMaterialService = {
       throw error;
     }
   },
+
+  getMaterialDetail: async (id: string, materialId: string) => {
+    try {
+      const response = await classSectionMaterialRepository.getMaterialDetail(id, materialId);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching material detail:", error);
+      throw error;
+    }
+  },
 };
+

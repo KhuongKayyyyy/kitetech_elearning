@@ -23,10 +23,14 @@ export const API_CONFIG = {
     GET_CLASS_MEMBERS: (id: string) => `/api/classrooms/${id}/members`,
     GET_CLASS_GRADES: (id: string) => `/api/classrooms/${id}/grades`,
 
+    // class session
+    // GET_CLASS_SESSION_DETAIL: (id: string) => `/api/classrooms/my-classrooms/${id}/sessions`,
+
     // Class Section material:
     CREATE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/${id}/posts`,
     GET_CLASS_FILES: (id: string) => `/api/classrooms/${id}/files`,
     UPDATE_CLASS_GRADE: (id: string,studentId:string) => `/api/classrooms/${id}/grades/${studentId}`,
+    GET_MATERIAL_DETAIL: (id: string, materialId: string) => `/api/classrooms/${id}/posts/${materialId}`,
     // ADD_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials`,
     // UPDATE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials/${id}`,
     // DELETE_CLASS_SECTION_MATERIAL: (id: string) => `/api/classrooms/my-classrooms/${id}/materials/${id}`,

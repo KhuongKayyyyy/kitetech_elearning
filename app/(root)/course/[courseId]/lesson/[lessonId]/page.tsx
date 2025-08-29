@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   BookOpen,
   Hash,
@@ -8,9 +8,9 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { FakeData } from "@/app/data/FakeData";
 import ClassSectionMaterialItem from "@/components/item/ClassSectionMaterialItem";
 import Link from "next/link";
+import { classSessionService } from "@/app/data/services/classSessionService";
 
 interface LessonPageProps {
   params: Promise<{
@@ -21,11 +21,50 @@ interface LessonPageProps {
 
 export default function page({ params }: LessonPageProps) {
   const resolvedParams = React.use(params);
-  const classSections = FakeData.getClassSections();
-  const classSection = classSections.find(
-    (section) => section.id === parseInt(resolvedParams.lessonId)
+  const [classSections, setClassSections] = useState<ClassSectionModel[]>([]);
+  const [classSection, setClassSection] = useState<ClassSectionModel | null>(
+    null
   );
-  const classSectionMaterials = FakeData.getClassSectionMaterial();
+  const [classSectionMaterials, setClassSectionMaterials] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchClassSections = async () => {
+      try {
+        setIsLoading(true);
+        console.log(
+          "Fetching class sections for course:",
+          resolvedParams.courseId
+        );
+        console.log("Lesson ID:", resolvedParams.lessonId);
+        const data = await classSessionService.getClassDetail(
+          resolvedParams.courseId
+        );
+        console.log("Class sections:", data);
+        setClassSections(data);
+
+        // Find the current section
+        const currentSection = data.find(
+          (section: ClassSectionModel) =>
+            section.id === parseInt(resolvedParams.lessonId)
+        );
+        setClassSection(currentSection);
+
+        // Set posts for the current section (replacing materials with posts)
+        if (currentSection && currentSection.posts) {
+          setClassSectionMaterials(currentSection.posts);
+        }
+      } catch (error) {
+        console.error("Failed to fetch class sections:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (resolvedParams.courseId && resolvedParams.lessonId) {
+      fetchClassSections();
+    }
+  }, [resolvedParams.courseId, resolvedParams.lessonId]);
 
   // Find current section index and get previous/next sections
   const currentSectionIndex = classSections.findIndex(
@@ -37,6 +76,24 @@ export default function page({ params }: LessonPageProps) {
     currentSectionIndex < classSections.length - 1
       ? classSections[currentSectionIndex + 1]
       : null;
+
+  if (isLoading) {
+    return (
+      <div className='flex flex-col min-h-screen w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 p-10'>
+        <div className='mx-5 group bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6'>
+          <div className='animate-pulse'>
+            <div className='h-6 bg-neutral-200 dark:bg-neutral-700 rounded w-1/3 mb-4'></div>
+            <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/4 mb-6'></div>
+            <div className='space-y-3'>
+              <div className='h-16 bg-neutral-200 dark:bg-neutral-700 rounded'></div>
+              <div className='h-16 bg-neutral-200 dark:bg-neutral-700 rounded'></div>
+              <div className='h-16 bg-neutral-200 dark:bg-neutral-700 rounded'></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!classSection) {
     return <div className='p-4 text-center'>Lesson not found</div>;
@@ -59,7 +116,7 @@ export default function page({ params }: LessonPageProps) {
           </div>
           <div className='flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400'>
             <FileText className='h-4 w-4' />
-            <span>{classSectionMaterials.length} materials</span>
+            <span>{classSectionMaterials.length} posts</span>
           </div>
         </div>
 

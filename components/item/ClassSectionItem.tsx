@@ -30,6 +30,7 @@ interface ClassSectionItemProps {
   onDeleteSection?: (sectionId: number) => void;
   defaultExpanded?: boolean;
   course?: Course;
+  onTapNavigation?: (classSection: ClassSectionModel) => void;
 }
 
 export default function ClassSectionItem({
@@ -37,6 +38,7 @@ export default function ClassSectionItem({
   onDeleteSection,
   defaultExpanded = false,
   course,
+  onTapNavigation,
 }: ClassSectionItemProps) {
   const [classSectionMaterials, setClassSectionMaterials] = useState<
     ClassSectionMaterialModel[]
@@ -131,63 +133,6 @@ export default function ClassSectionItem({
     }
   };
 
-  // const handleAddDocumentMaterial = (materialData: {
-  //   title: string;
-  //   description?: string;
-  //   file?: File;
-  //   link?: string;
-  //   deadline?: string;
-  //   type: ClassAssignmentEnum;
-  // }) => {
-  //   const currentIds = classSectionMaterials.map((m) => m.id);
-  //   const maxId = currentIds.length > 0 ? Math.max(...currentIds) : 0;
-
-  //   const newMaterial = {
-  //     id: maxId + 1,
-  //     classSectionId: classSection.id,
-  //     material: materialData.title,
-  //     type: materialData.type,
-  //     content: materialData.description || "",
-  //     link: materialData.link,
-  //     deadline: materialData.deadline,
-  //   } as unknown as ClassSectionMaterialModel;
-
-  //   setClassSectionMaterials((prev) => {
-  //     const updated = [...prev, newMaterial];
-  //     console.log("Updated materials array:", updated);
-  //     return updated;
-  //   });
-
-  //   console.log("=== New Material Added ===");
-  //   console.log("Title:", materialData.title);
-  //   console.log("Description:", materialData.description);
-  //   console.log("Type:", materialData.type);
-  //   if (materialData.link) console.log("Link:", materialData.link);
-  //   if (materialData.deadline) console.log("Deadline:", materialData.deadline);
-  //   if (materialData.file) {
-  //     console.log("File Information:");
-  //     console.log("  - Name:", materialData.file.name);
-  //     console.log("  - Size:", materialData.file.size, "bytes");
-  //     console.log("  - Type:", materialData.file.type);
-  //     console.log(
-  //       "  - Last Modified:",
-  //       new Date(materialData.file.lastModified).toISOString()
-  //     );
-  //   } else {
-  //     console.log("No file attached");
-  //   }
-
-  //   console.log("Added at:", new Date().toISOString());
-  //   console.log("Section ID:", classSection.id);
-  //   console.log("Section Name:", classSection.name);
-  //   console.log("New Material ID:", newMaterial.id);
-  //   console.log("Current materials count:", classSectionMaterials.length);
-  //   console.log("========================");
-
-  //   toast.success("Material added successfully");
-  //   setIsAddDocumentMaterialOpen(false);
-  // };
-
   const toggleExpanded = (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsExpanded(!isExpanded);
@@ -238,9 +183,13 @@ export default function ClassSectionItem({
                     e.stopPropagation();
                     setIsEditingName(true);
                   } else {
-                    router.push(
-                      `/course/${classSection.course}/lesson/${classSection.id}`
-                    );
+                    if (onTapNavigation) {
+                      onTapNavigation(classSection);
+                    } else {
+                      router.push(
+                        `/course/${course?.id}/lesson/${classSection.id}`
+                      );
+                    }
                   }
                 }}
                 className={`inline-flex items-center px-4 py-2 text-sm font-semibold bg-gradient-to-r from-primary/15 to-primary/10 text-primary rounded-xl border border-primary/20 transition-all duration-200 ${
@@ -349,25 +298,7 @@ export default function ClassSectionItem({
       {/* Compressed mode preview - Show when collapsed and has materials */}
       {!isExpanded && classSectionMaterials.length > 0 && (
         <div className='space-y-3'>
-          <div className='flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400'>
-            <span>
-              {classSectionMaterials.length} material
-              {classSectionMaterials.length !== 1 ? "s" : ""} available
-            </span>
-            <div className='flex gap-1'>
-              {classSectionMaterials.slice(0, 3).map((material, index) => (
-                <div
-                  key={material.id}
-                  className='w-2 h-2 bg-primary/40 rounded-full'
-                />
-              ))}
-              {classSectionMaterials.length > 3 && (
-                <span className='text-xs'>
-                  +{classSectionMaterials.length - 3}
-                </span>
-              )}
-            </div>
-          </div>
+          <div className='flex items-center gap-2 text-sm text-neutral-500 dark:text-neutral-400'></div>
           {isTeacher && (
             <NameRecognitionDialog
               qrCodeValue={JSON.stringify({

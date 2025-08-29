@@ -13,4 +13,10 @@ export const classSectionMaterialRepository = {
 
   getClassSectionFiles: (id: string) =>
     axiosClient.get(API_CONFIG.GET_CLASS_FILES(id)),
+
+  getMaterialDetail: (id: string, materialId: string) => {
+    const url = API_CONFIG.GET_MATERIAL_DETAIL(id, materialId);
+    console.log("🔗 getMaterialDetail URL:", url);
+    return axiosClient.get(url);
+  },
 };

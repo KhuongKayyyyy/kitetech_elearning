@@ -1,3 +1,4 @@
+"use client";
 import { useEffect, useState } from "react";
 import { authService } from "@/app/data/services/authService";
 import { authRepository } from "@/app/data/respository/authRepository";

@@ -22,6 +22,47 @@ interface CoursePageProps {
   params: Promise<{ courseId: string }>;
 }
 
+// Skeleton components
+const ClassSectionSkeleton = () => (
+  <div className='space-y-4'>
+    {[1, 2, 3].map((i) => (
+      <div
+        key={i}
+        className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm'>
+        <div className='flex items-center gap-3 mb-4'>
+          <div className='w-10 h-10 bg-neutral-200 dark:bg-neutral-700 rounded-lg animate-pulse'></div>
+          <div className='flex-1'>
+            <div className='h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse mb-2 w-48'></div>
+            <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-32'></div>
+          </div>
+        </div>
+        <div className='space-y-3'>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-full'></div>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-3/4'></div>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-1/2'></div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+const SidebarSkeleton = () => (
+  <div className='space-y-6'>
+    {[1, 2, 3, 4].map((i) => (
+      <div
+        key={i}
+        className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 shadow-sm'>
+        <div className='h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse mb-3 w-24'></div>
+        <div className='space-y-2'>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-full'></div>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-3/4'></div>
+          <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-1/2'></div>
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
 export default function Page({ params }: CoursePageProps) {
   const actualParams = React.use(params);
 
@@ -116,15 +157,15 @@ export default function Page({ params }: CoursePageProps) {
     setNewSectionName("");
   };
 
-  if (!course) {
+  if (!course && !isLoading) {
     return <div className='p-4 text-center'>Course not found</div>;
   }
 
-  if (isLoading) {
-    return <div className='p-4 text-center'>Loading class sessions...</div>;
-  }
-
   const renderTabContent = () => {
+    if (isLoading) {
+      return <ClassSectionSkeleton />;
+    }
+
     switch (activeTab) {
       case "stream":
         return (
@@ -163,20 +204,34 @@ export default function Page({ params }: CoursePageProps) {
         />
         <div className='flex-[3]'>
           <div className='w-full'>
-            <CourseBriefInformation course={course} />
+            {isLoading ? (
+              <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm mb-6'>
+                <div className='h-8 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse mb-4 w-64'></div>
+                <div className='h-6 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse mb-2 w-48'></div>
+                <div className='h-5 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse w-32'></div>
+              </div>
+            ) : (
+              <CourseBriefInformation course={course} />
+            )}
           </div>
 
           {/* Sidebar content for mobile/tablet (below brief information) */}
           <div className='block lg:hidden w-full space-y-6 mb-6 px-6'>
-            <ClassMeetSection />
-            <CourseProcess />
-            <CourseSectionMap
-              classSession={classSections}
-              currentSectionId={classSections[0]?.id}
-            />
-            <CourseFileSection
-              classSectionId={classSections[0]?.id.toString()}
-            />
+            {isLoading ? (
+              <SidebarSkeleton />
+            ) : (
+              <>
+                <ClassMeetSection />
+                <CourseProcess />
+                <CourseSectionMap
+                  classSession={classSections}
+                  currentSectionId={classSections[0]?.id}
+                />
+                <CourseFileSection
+                  classSectionId={classSections[0]?.id.toString()}
+                />
+              </>
+            )}
           </div>
 
           {/* Tab Navigation */}
@@ -243,16 +298,24 @@ export default function Page({ params }: CoursePageProps) {
 
         {/* Right Sidebar (visible only on large screens) */}
         <aside className='hidden lg:block lg:w-80 shrink-0 py-6'>
-          <ClassMeetSection />
-          <div className='mt-6'></div>
-          <CourseProcess />
-          <div className='mt-6'></div>
-          <CourseSectionMap
-            classSession={classSections}
-            currentSectionId={classSections[0]?.id}
-          />
-          <div className='mt-6'></div>
-          <CourseFileSection classSectionId={classSections[0]?.id.toString()} />
+          {isLoading ? (
+            <SidebarSkeleton />
+          ) : (
+            <>
+              <ClassMeetSection />
+              <div className='mt-6'></div>
+              <CourseProcess />
+              <div className='mt-6'></div>
+              <CourseSectionMap
+                classSession={classSections}
+                currentSectionId={classSections[0]?.id}
+              />
+              <div className='mt-6'></div>
+              <CourseFileSection
+                classSectionId={classSections[0]?.id.toString()}
+              />
+            </>
+          )}
         </aside>
       </div>
 

@@ -17,7 +17,6 @@ import DOMPurify from "isomorphic-dompurify";
 import router, { useRouter } from "next/navigation";
 import { FakeData } from "@/app/data/FakeData";
 import { CourseData } from "@/app/data/api/course_data";
-import { ClassAssignmentEnum } from "@/app/data/enum/ClassAssignmentEnum";
 
 const md = markdownit();
 
@@ -28,17 +27,17 @@ interface ClassSectionMaterialItemProps {
 
 const getIconForType = (type: string) => {
   switch (type.toLowerCase()) {
-    case ClassAssignmentEnum.LINK:
+    case "link":
       return <Link className='h-4 w-4 sm:h-5 sm:w-5 text-blue-500' />;
     case "video":
       return <Video className='h-4 w-4 sm:h-5 sm:w-5 text-red-500' />;
     case "image":
       return <Image className='h-4 w-4 sm:h-5 sm:w-5 text-green-500' />;
-    case ClassAssignmentEnum.ANNOUNCEMENT:
+    case "announcement":
       return <Megaphone className='h-4 w-4 sm:h-5 sm:w-5 text-orange-500' />;
-    case ClassAssignmentEnum.SUBMISSION:
+    case "submission":
       return <Upload className='h-4 w-4 sm:h-5 sm:w-5 text-purple-500' />;
-    case ClassAssignmentEnum.DOCUMENT:
+    case "document":
       return <FileText className='h-4 w-4 sm:h-5 sm:w-5 text-indigo-500' />;
     default:
       return <FileText className='h-4 w-4 sm:h-5 sm:w-5 text-gray-500' />;
@@ -87,10 +86,7 @@ export default function ClassSectionMaterialItem({
   };
 
   const handleLinkClick = () => {
-    if (
-      material.type === ClassAssignmentEnum.LINK &&
-      material.content.startsWith("http")
-    ) {
+    if (material.type === "link" && material.content.startsWith("http")) {
       window.open(material.content, "_blank");
     }
   };
@@ -102,9 +98,9 @@ export default function ClassSectionMaterialItem({
   };
 
   const handleItemClick = () => {
-    if (material.type === ClassAssignmentEnum.LINK) {
+    if (material.type === "link") {
       handleLinkClick();
-    } else if (material.type === ClassAssignmentEnum.DOCUMENT && fileInfo) {
+    } else if (material.type === "document" && fileInfo) {
       handleFileDownload();
     } else {
       handleTitleClick();
@@ -124,10 +120,9 @@ export default function ClassSectionMaterialItem({
   };
 
   const isMarkdownType =
-    material.type === ClassAssignmentEnum.ANNOUNCEMENT ||
-    material.type === ClassAssignmentEnum.SUBMISSION;
+    material.type === "announcement" || material.type === "submission";
 
-  const hasFileAttachment = fileInfo && fileInfo.originalName;
+  const hasFileAttachment = material.type === "document" && fileInfo;
 
   // Parse markdown and sanitize
   const parsedContent = isMarkdownType
@@ -137,14 +132,10 @@ export default function ClassSectionMaterialItem({
   return (
     <div
       className={`mx-2 sm:mx-5 group bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg p-3 sm:p-4 hover:border-black hover:border-3 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200 ${
-        material.type === ClassAssignmentEnum.LINK ||
-        (material.type === ClassAssignmentEnum.DOCUMENT && hasFileAttachment)
-          ? "cursor-pointer"
-          : ""
+        material.type === "link" || hasFileAttachment ? "cursor-pointer" : ""
       }`}
       onClick={
-        material.type === ClassAssignmentEnum.LINK ||
-        (material.type === ClassAssignmentEnum.DOCUMENT && hasFileAttachment)
+        material.type === "link" || hasFileAttachment
           ? handleItemClick
           : undefined
       }>
@@ -168,16 +159,12 @@ export default function ClassSectionMaterialItem({
         <div className='flex-1 min-w-0'>
           <h3
             className={`text-sm sm:text-base font-medium text-neutral-900 dark:text-neutral-100 line-clamp-2 sm:truncate transition-colors ${
-              material.type === ClassAssignmentEnum.LINK ||
-              (material.type === ClassAssignmentEnum.DOCUMENT &&
-                hasFileAttachment)
+              material.type === "link" || hasFileAttachment
                 ? ""
                 : "cursor-pointer hover:text-primary"
             }`}
             onClick={
-              material.type === ClassAssignmentEnum.LINK ||
-              (material.type === ClassAssignmentEnum.DOCUMENT &&
-                hasFileAttachment)
+              material.type === "link" || hasFileAttachment
                 ? undefined
                 : handleTitleClick
             }>
@@ -187,7 +174,7 @@ export default function ClassSectionMaterialItem({
             <span className='inline-flex items-center px-2 py-1 text-xs font-medium bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-300 rounded w-fit'>
               {material.type}
             </span>
-            {material.type === ClassAssignmentEnum.LINK && (
+            {material.type === "link" && (
               <span className='text-xs text-neutral-500 dark:text-neutral-400 truncate block sm:inline'>
                 {material.content}
               </span>
@@ -199,7 +186,7 @@ export default function ClassSectionMaterialItem({
             )}
           </div>
 
-          {/* File information display for all types that have files */}
+          {/* File information display */}
           {hasFileAttachment && (
             <div className='mt-2 p-2 bg-neutral-50 dark:bg-neutral-700/50 rounded border border-neutral-200 dark:border-neutral-600'>
               <div className='flex items-center gap-2'>
