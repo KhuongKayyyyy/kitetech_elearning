@@ -1,5 +1,4 @@
 "use client";
-import { FakeData } from "@/app/data/FakeData";
 import React, { useState } from "react";
 import {
   BookOpen,

@@ -4,9 +4,15 @@ import { FakeData } from "../../app/data/FakeData";
 import RecentAccessCourseItem from "../item/RecentAccessCourseItem";
 import { CourseData } from "@/app/data/api/course_data";
 
-export default function RecentAccessedCourse() {
-  // Get first 5 courses from fake data as recent accessed courses
-  const recentCourses = CourseData.getCourses().slice(0, 5);
+interface RecentAccessedCourseProps {
+  courses: Course[];
+}
+
+export default function RecentAccessedCourse({
+  courses,
+}: RecentAccessedCourseProps) {
+  // Get first 5 courses from the passed real data as recent accessed courses
+  const recentCourses = courses.slice(0, 5);
 
   return (
     <div className='p-6 w-full max-w-4xl'>

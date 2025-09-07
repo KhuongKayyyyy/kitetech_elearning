@@ -1,5 +1,5 @@
 "use client";
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import RegisSubjectTable from "@/components/item_list/RegisSubjectTable";
 import FloatingRegisedSubject from "@/components/item_list/FloatingRegisedSubject";
 import RegistedSubjectTable from "@/components/item_list/RegistedSubjectTable";
@@ -18,13 +18,17 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { courseRegisService } from "@/app/data/services/courseRegisService";
+import { CourseRegistrationSubject } from "@/app/data/model/courseRegisModel";
+import { semesterService } from "@/app/data/services/semesterService";
+import { SemesterModel } from "@/app/data/model/SemesterModel";
 
 export default function Page() {
   const availableSubjects = CourseData.getCourses();
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(
     new Set()
   );
-  const [selectedSemester, setSelectedSemester] = useState<string>("2024-1");
+  const [selectedSemester, setSelectedSemester] = useState<string>(""); // Will be set when semesters are loaded
   const [activeTab, setActiveTab] = useState<"register" | "registered">(
     "register"
   );
@@ -32,6 +36,57 @@ export default function Page() {
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [confirmedSubjects, setConfirmedSubjects] = useState<any[]>([]);
+  const [registeredCourses, setRegisteredCourses] = useState<
+    CourseRegistrationSubject[]
+  >([]);
+  const [isLoadingRegisteredCourses, setIsLoadingRegisteredCourses] =
+    useState(false);
+  const [semesters, setSemesters] = useState<SemesterModel[]>([]);
+  const [isLoadingSemesters, setIsLoadingSemesters] = useState(false);
+
+  // Fetch semesters when component mounts
+  useEffect(() => {
+    const fetchSemesters = async () => {
+      setIsLoadingSemesters(true);
+      try {
+        const semestersData = await semesterService.getSemesters();
+        setSemesters(semestersData);
+        // Set the first semester as default if none is selected
+        if (semestersData.length > 0 && !selectedSemester) {
+          setSelectedSemester(semestersData[0].id.toString());
+        }
+      } catch (error) {
+        console.error("Error fetching semesters:", error);
+        toast.error("Failed to fetch semesters");
+      } finally {
+        setIsLoadingSemesters(false);
+      }
+    };
+
+    fetchSemesters();
+  }, []);
+
+  // Fetch registered courses when component mounts or semester changes
+  useEffect(() => {
+    const fetchRegisteredCourses = async () => {
+      if (!selectedSemester) return;
+
+      setIsLoadingRegisteredCourses(true);
+      try {
+        const courses = await courseRegisService.getRegisteredCourses(
+          selectedSemester
+        );
+        setRegisteredCourses(courses);
+      } catch (error) {
+        console.error("Error fetching registered courses:", error);
+        toast.error("Failed to fetch registered courses");
+      } finally {
+        setIsLoadingRegisteredCourses(false);
+      }
+    };
+
+    fetchRegisteredCourses();
+  }, [selectedSemester]);
 
   const registrableSubjects = useMemo(
     () =>
@@ -84,13 +139,6 @@ export default function Page() {
       setIsSubmitting(false);
     }
   };
-
-  const semesters = [
-    { value: "2024-1", label: "Spring 2024" },
-    { value: "2024-2", label: "Fall 2024" },
-    { value: "2023-2", label: "Fall 2023" },
-    { value: "2023-1", label: "Spring 2023" },
-  ];
 
   return (
     <div className='min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100'>
@@ -190,21 +238,39 @@ export default function Page() {
                       className='text-sm font-medium text-gray-700 whitespace-nowrap'>
                       Semester:
                     </label>
-                    <select
-                      id='semester'
-                      value={selectedSemester}
-                      onChange={(e) => setSelectedSemester(e.target.value)}
-                      className='px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 text-sm min-w-[140px]'>
-                      {semesters.map((semester) => (
-                        <option key={semester.value} value={semester.value}>
-                          {semester.label}
-                        </option>
-                      ))}
-                    </select>
+                    {isLoadingSemesters ? (
+                      <div className='px-3 py-1 text-sm text-gray-500'>
+                        Loading semesters...
+                      </div>
+                    ) : (
+                      <select
+                        id='semester'
+                        value={selectedSemester}
+                        onChange={(e) => setSelectedSemester(e.target.value)}
+                        className='px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white text-gray-900 text-sm min-w-[140px]'>
+                        {semesters.map((semester) => (
+                          <option
+                            key={semester.id}
+                            value={semester.id.toString()}>
+                            {semester.name}
+                          </option>
+                        ))}
+                      </select>
+                    )}
                   </div>
                 </div>
 
-                <RegistedSubjectTable registeredSubjects={confirmedSubjects} />
+                {isLoadingRegisteredCourses ? (
+                  <div className='flex justify-center items-center py-8'>
+                    <div className='text-gray-600'>
+                      Loading registered courses...
+                    </div>
+                  </div>
+                ) : (
+                  <RegistedSubjectTable
+                    registeredSubjects={registeredCourses}
+                  />
+                )}
               </div>
             )}
           </div>

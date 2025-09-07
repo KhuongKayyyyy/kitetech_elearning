@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -18,11 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import {
-  StudentScore,
-  getStudentScoresByCourse,
-} from "@/app/data/api/score_data";
-import { FakeData } from "@/app/data/FakeData";
 
 const ScoreCell = ({ value }: { value: number | null }) => {
   if (value === null) {
@@ -74,91 +69,91 @@ const GradeBadge = ({ grade }: { grade: string }) => {
   );
 };
 
-// Fake student score data
+// Student score data based on provided classes
 const getFakeStudentScores = () => {
   return [
     {
       id: 1,
-      courseCode: "CS 2110",
-      courseName: "Computer Programming",
+      courseCode: "CS101",
+      courseName: "Introduction to Programming",
       qt1: 8.5,
       qt2: 9.0,
       midterm: 8.8,
       finalTerm: 9.2,
       average: 8.9,
       grade: "A",
-      semester: "HK1 2023-2024",
+      semester: "HK1 2025-2026",
     },
     {
       id: 2,
-      courseCode: "MATH 2940",
-      courseName: "Linear Algebra",
+      courseCode: "CS201",
+      courseName: "Data Structures and Algorithms",
       qt1: 7.5,
       qt2: 8.0,
       midterm: 7.8,
       finalTerm: 8.2,
       average: 7.9,
       grade: "B",
-      semester: "HK1 2023-2024",
+      semester: "HK1 2025-2026",
     },
     {
       id: 3,
-      courseCode: "PHIL 1101",
-      courseName: "Introduction to Philosophy",
+      courseCode: "CS301",
+      courseName: "Database Systems",
       qt1: 9.0,
       qt2: 8.5,
       midterm: 9.2,
       finalTerm: 8.8,
       average: 8.9,
       grade: "A",
-      semester: "HK2 2023-2024",
+      semester: "HK1 2025-2026",
     },
     {
       id: 4,
-      courseCode: "PE 1440",
-      courseName: "Physical Education",
+      courseCode: "CS401",
+      courseName: "Operating Systems",
       qt1: 8.0,
       qt2: 8.5,
       midterm: 8.2,
       finalTerm: 8.8,
       average: 8.4,
       grade: "B",
-      semester: "HK2 2023-2024",
+      semester: "HK1 2025-2026",
     },
     {
       id: 5,
-      courseCode: "CS 3410",
-      courseName: "Data Structures",
+      courseCode: "CS501",
+      courseName: "Computer Networks",
       qt1: 9.5,
       qt2: 9.0,
       midterm: 9.3,
       finalTerm: 9.1,
       average: 9.2,
       grade: "A",
-      semester: "HK1 2024-2025",
-    },
-    {
-      id: 6,
-      courseCode: "PE 1220",
-      courseName: "Swimming",
-      qt1: 7.0,
-      qt2: 7.5,
-      midterm: 7.2,
-      finalTerm: 7.8,
-      average: 7.4,
-      grade: "C",
-      semester: "HK1 2024-2025",
+      semester: "HK1 2025-2026",
     },
   ];
 };
 
 export default function StudentScorePage() {
+  const [loading, setLoading] = useState(true);
+
   // Use fake data
   const allStudentScores = useMemo(() => {
     return getFakeStudentScores();
   }, []);
 
-  const [selectedSemester, setSelectedSemester] = useState<string>("all");
+  const [selectedSemester, setSelectedSemester] =
+    useState<string>("HK1 2025-2026");
+
+  // Loading effect for 2 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Filter scores by semester
   const filteredScores = useMemo(() => {
@@ -191,6 +186,80 @@ export default function StudentScorePage() {
     };
   }, [filteredScores]);
 
+  if (loading) {
+    return (
+      <div className='container mx-auto p-6 space-y-6'>
+        {/* Header Skeleton */}
+        <div className='flex flex-col md:flex-row md:items-center md:justify-between gap-4'>
+          <div className='space-y-2'>
+            <div className='h-8 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-64 animate-pulse'></div>
+            <div className='h-5 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-80 animate-pulse'></div>
+          </div>
+          <div className='h-10 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-48 animate-pulse'></div>
+        </div>
+
+        {/* Table Skeleton */}
+        <Card>
+          <CardHeader>
+            <div className='h-6 bg-neutral-200 dark:bg-neutral-700 rounded-lg w-32 animate-pulse'></div>
+          </CardHeader>
+          <CardContent>
+            <div className='rounded-md border'>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-32 animate-pulse'></div>
+                    </TableHead>
+                    <TableHead className='text-center w-20'>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                    </TableHead>
+                    <TableHead className='text-center w-20'>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                    </TableHead>
+                    <TableHead className='text-center w-24'>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-16 mx-auto animate-pulse'></div>
+                    </TableHead>
+                    <TableHead className='text-center w-24'>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-12 mx-auto animate-pulse'></div>
+                    </TableHead>
+                    <TableHead className='text-center w-24'>
+                      <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-16 mx-auto animate-pulse'></div>
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[...Array(5)].map((_, index) => (
+                    <TableRow key={index}>
+                      <TableCell>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-48 animate-pulse'></div>
+                      </TableCell>
+                      <TableCell className='text-center'>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                      </TableCell>
+                      <TableCell className='text-center'>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                      </TableCell>
+                      <TableCell className='text-center'>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                      </TableCell>
+                      <TableCell className='text-center'>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                      </TableCell>
+                      <TableCell className='text-center'>
+                        <div className='h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-8 mx-auto animate-pulse'></div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className='container mx-auto p-6 space-y-6'>
       {/* Header */}
@@ -209,9 +278,7 @@ export default function StudentScorePage() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value='all'>All Semesters</SelectItem>
-              <SelectItem value='HK1 2023-2024'>HK1 2023-2024</SelectItem>
-              <SelectItem value='HK2 2023-2024'>HK2 2023-2024</SelectItem>
-              <SelectItem value='HK1 2024-2025'>HK1 2024-2025</SelectItem>
+              <SelectItem value='HK1 2025-2026'>HK1 2025-2026</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -227,7 +294,6 @@ export default function StudentScorePage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className='w-32'>Course Code</TableHead>
                   <TableHead>Course Name</TableHead>
                   <TableHead className='text-center w-20'>QT1</TableHead>
                   <TableHead className='text-center w-20'>QT2</TableHead>
@@ -240,7 +306,7 @@ export default function StudentScorePage() {
                 {filteredScores.length === 0 ? (
                   <TableRow>
                     <TableCell
-                      colSpan={7}
+                      colSpan={6}
                       className='text-center py-8 text-muted-foreground'>
                       No scores available
                     </TableCell>
@@ -248,9 +314,6 @@ export default function StudentScorePage() {
                 ) : (
                   filteredScores.map((score) => (
                     <TableRow key={score.id} className='hover:bg-muted/50'>
-                      <TableCell className='font-medium'>
-                        {score.courseCode}
-                      </TableCell>
                       <TableCell>{score.courseName}</TableCell>
                       <TableCell className='text-center'>
                         <ScoreCell value={score.qt1} />

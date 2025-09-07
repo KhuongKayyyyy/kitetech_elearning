@@ -73,15 +73,7 @@ function SortableTimeSlot({ slot }: { slot: TimeSlot }) {
 }
 
 export default function TodayCalendar() {
-  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([
-    { id: "1", time: "6:00 - 9:00", section: "Section 1" },
-    { id: "2", time: "9:00 - 12:00", section: "Section 2" },
-    { id: "3", time: "12:00 - 13:00", section: "Section 3" },
-    { id: "4", time: "13:00 - 16:00", section: "Section 4" },
-    { id: "5", time: "16:00 - 19:00", section: "Section 5" },
-    { id: "6", time: "19:00 - 22:00", section: "Section 1" },
-    { id: "7", time: "22:00 - 1:00", section: "Section 2" },
-  ]);
+  const [timeSlots, setTimeSlots] = useState<TimeSlot[]>([]);
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -126,20 +118,38 @@ export default function TodayCalendar() {
         </p>
       </div>
 
-      <div className='bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm overflow-hidden'>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}>
-          <SortableContext
-            items={timeSlots.map((slot) => slot.id)}
-            strategy={verticalListSortingStrategy}>
-            {timeSlots.map((slot) => (
-              <SortableTimeSlot key={slot.id} slot={slot} />
-            ))}
-          </SortableContext>
-        </DndContext>
-      </div>
+      {timeSlots.length === 0 ? (
+        <div className='bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm p-12 text-center'>
+          <div className='flex flex-col items-center gap-4'>
+            <div className='p-4 bg-neutral-100 dark:bg-neutral-700 rounded-full'>
+              <Calendar className='h-8 w-8 text-neutral-400 dark:text-neutral-500' />
+            </div>
+            <div>
+              <h3 className='text-lg font-semibold text-neutral-700 dark:text-neutral-300 mb-2'>
+                No Schedule Available
+              </h3>
+              <p className='text-neutral-500 dark:text-neutral-400'>
+                No events are scheduled for today. Your day is completely free!
+              </p>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className='bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm overflow-hidden'>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={timeSlots.map((slot) => slot.id)}
+              strategy={verticalListSortingStrategy}>
+              {timeSlots.map((slot) => (
+                <SortableTimeSlot key={slot.id} slot={slot} />
+              ))}
+            </SortableContext>
+          </DndContext>
+        </div>
+      )}
 
       <div className='mt-6 p-4 bg-gradient-to-r from-primary/5 to-primary/10 border border-primary/20 rounded-lg'>
         <p className='text-sm text-primary/80 dark:text-primary/70 text-center'>

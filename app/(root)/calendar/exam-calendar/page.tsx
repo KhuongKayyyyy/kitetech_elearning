@@ -33,6 +33,11 @@ export default function page() {
     "All Exams",
   ];
 
+  // Filter semesters to only show HK1 2025-2026
+  const availableSemesters = MOCK_SEMESTERS.filter(
+    (semester) => semester.name === "Semester 1 2025-2026"
+  );
+
   const handleViewCalendar = () => {
     if (selectedSemester && selectedExamType) {
       setShowCalendar(true);
@@ -53,7 +58,7 @@ export default function page() {
   };
 
   if (showCalendar) {
-    const selectedSemesterData = MOCK_SEMESTERS.find(
+    const selectedSemesterData = availableSemesters.find(
       (sem) => sem.id.toString() === selectedSemester
     );
 
@@ -117,7 +122,7 @@ export default function page() {
                     <SelectValue placeholder='Choose your semester' />
                   </SelectTrigger>
                   <SelectContent>
-                    {MOCK_SEMESTERS.map((semester) => (
+                    {availableSemesters.map((semester) => (
                       <SelectItem
                         key={semester.id}
                         value={semester.id.toString()}>
@@ -188,7 +193,7 @@ export default function page() {
                     <p>
                       <span className='font-medium'>Semester:</span>{" "}
                       {
-                        MOCK_SEMESTERS.find(
+                        availableSemesters.find(
                           (sem) => sem.id.toString() === selectedSemester
                         )?.name
                       }

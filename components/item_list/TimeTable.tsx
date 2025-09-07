@@ -6,7 +6,80 @@ interface TimeTableProps {
 }
 
 export default function TimeTable({ date = new Date() }: TimeTableProps) {
-  // Fake timetable data
+  // Fake timetable data based on the provided course structure
+  const courses = [
+    {
+      id: 1,
+      name: "Introduction to Programming",
+      description: "Fundamentals of programming using C language.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 2,
+      schedule: "Wednesday",
+      location: "C101",
+      enrolled: 97,
+      rating: 4.8,
+      type: "elective",
+      semester: "HK1 2025-2026",
+    },
+    {
+      id: 2,
+      name: "Data Structures and Algorithms",
+      description: "Study of data organization and algorithm design.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 4,
+      section: 4,
+      schedule: "Saturday",
+      location: "B202",
+      enrolled: 167,
+      rating: 3.6,
+      type: "required",
+      semester: "HK1 2025-2026",
+    },
+    {
+      id: 3,
+      name: "Database Systems",
+      description: "Relational databases, SQL, and normalization.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 3,
+      schedule: "Wednesday",
+      location: "A201",
+      enrolled: 237,
+      rating: 4,
+      type: "main",
+      semester: "HK1 2025-2026",
+    },
+    {
+      id: 4,
+      name: "Operating Systems",
+      description: "Principles of OS, processes, and memory management.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 1,
+      schedule: "Saturday",
+      location: "C101",
+      enrolled: 56,
+      rating: 4.4,
+      type: "elective",
+      semester: "HK1 2025-2026",
+    },
+    {
+      id: 5,
+      name: "Computer Networks",
+      description: "Networking models, TCP/IP, routing and switching.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 5,
+      schedule: "Wednesday",
+      location: "B202",
+      enrolled: 126,
+      rating: 4.8,
+      type: "required",
+      semester: "HK1 2025-2026",
+    },
+  ];
+
   const sections = [
     "Section 1",
     "Section 2",
@@ -39,47 +112,57 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
     return weekDate;
   });
 
-  // Fake schedule data - mapping day and section to course info
+  // Create schedule data mapping based on course data
   const scheduleData = {
-    "Monday-1": {
-      className: "Nhập môn xử lý ngôn ngữ tự nhiên",
-      courseCode: "1",
-      room: "D0201-A",
+    "Wednesday-1": {
+      className: courses[2].name,
+      courseCode: courses[2].id.toString(),
+      room: courses[2].location,
       period: "1-2",
       week: "1-16",
-      group: "5",
+      group: courses[2].section.toString(),
+      instructor: courses[2].instructor,
+      credits: courses[2].credits,
     },
-    "Tuesday-4": {
-      className: "Web Development",
-      courseCode: "2",
-      room: "B102",
+    "Wednesday-2": {
+      className: courses[0].name,
+      courseCode: courses[0].id.toString(),
+      room: courses[0].location,
       period: "3-4",
-      week: "1-15",
-      group: "3",
+      week: "1-16",
+      group: courses[0].section.toString(),
+      instructor: courses[0].instructor,
+      credits: courses[0].credits,
     },
-    "Wednesday-0": {
-      className: "Database Systems",
-      courseCode: "3",
-      room: "A301",
-      period: "1-2",
-      week: "2-16",
-      group: "2",
+    "Wednesday-5": {
+      className: courses[4].name,
+      courseCode: courses[4].id.toString(),
+      room: courses[4].location,
+      period: "5-6",
+      week: "1-16",
+      group: courses[4].section.toString(),
+      instructor: courses[4].instructor,
+      credits: courses[4].credits,
     },
-    "Thursday-3": {
-      className: "Software Engineering",
-      courseCode: "4",
-      room: "C201",
-      period: "7-8",
+    "Saturday-1": {
+      className: courses[3].name,
+      courseCode: courses[3].id.toString(),
+      room: courses[3].location,
+      period: "5-6",
       week: "1-14",
-      group: "1",
+      group: courses[3].section.toString(),
+      instructor: courses[3].instructor,
+      credits: courses[3].credits,
     },
-    "Friday-1": {
-      className: "Machine Learning",
-      courseCode: "5",
-      room: "D301",
-      period: "3-4",
-      week: "3-16",
-      group: "4",
+    "Saturday-4": {
+      className: courses[1].name,
+      courseCode: courses[1].id.toString(),
+      room: courses[1].location,
+      period: "7-8",
+      week: "1-15",
+      group: courses[1].section.toString(),
+      instructor: courses[1].instructor,
+      credits: courses[1].credits,
     },
   };
 
@@ -138,7 +221,7 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
 
                 {/* Course slots for each day */}
                 {weekDays.map((day, dayIndex) => {
-                  const scheduleKey = `${day}-${sectionIndex}`;
+                  const scheduleKey = `${day}-${sectionIndex + 1}`;
                   const courseData =
                     scheduleData[scheduleKey as keyof typeof scheduleData];
 

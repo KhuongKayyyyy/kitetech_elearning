@@ -37,4 +37,18 @@ export const API_CONFIG = {
 
 
 
+    // course registration
+    GET_REGISTERED_COURSES: (semesterId: string) => `/api/student-course-registration/subjects-by-semester?semester_id=${semesterId}`,
+    GET_REGISTERED_COURSE: (id: string) => `/api/course-registrations/${id}`,
+    ADD_REGISTERED_COURSE: "/api/course-registrations",
+    UPDATE_REGISTERED_COURSE: (id: string) => `/api/course-registrations/${id}`,
+    DELETE_REGISTERED_COURSE: (id: string) => `/api/course-registrations/${id}`,
+
+    // semester
+    GET_SEMESTERS: "/api/semesters",
+    GET_SEMESTER: (id: string) => `/api/semesters/${id}`,
+    ADD_SEMESTER: "/api/semesters",
+    UPDATE_SEMESTER: (id: string) => `/api/semesters/${id}`,
+    DELETE_SEMESTER: (id: string) => `/api/semesters/${id}`,
+    GET_BY_ACADEMIC_YEAR_ID: (academic_year_id: string) => `/api/semesters/academic-year/${academic_year_id}`,
 }

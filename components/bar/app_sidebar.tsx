@@ -16,6 +16,11 @@ import {
   BookOpen,
   ListTodo,
   ListOrdered,
+  FileText,
+  GraduationCap,
+  Award,
+  UserPlus,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -48,11 +53,6 @@ export function AppSidebar() {
       return [
         ...baseLinks,
         {
-          label: "Settings",
-          href: "/settings",
-          icon: <Settings className='h-5 w-5 flex-shrink-0' />,
-        },
-        {
           label: "Score",
           href: "/score",
           icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
@@ -71,27 +71,27 @@ export function AppSidebar() {
         {
           label: "Assignments",
           href: "/assignment",
-          icon: <BookOpen className='h-5 w-5 flex-shrink-0' />,
+          icon: <FileText className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Curriculum",
           href: "/curriculum",
-          icon: <ListOrdered className='h-5 w-5 flex-shrink-0' />,
+          icon: <GraduationCap className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Score",
           href: "/score",
-          icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
+          icon: <Award className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Registration",
           href: "/registration",
-          icon: <ListTodo className='h-5 w-5 flex-shrink-0' />,
+          icon: <UserPlus className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Profile",
           href: "/profile",
-          icon: <UserCog className='h-5 w-5 flex-shrink-0' />,
+          icon: <User className='h-5 w-5 flex-shrink-0' />,
         },
         {
           label: "Logout",

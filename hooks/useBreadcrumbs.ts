@@ -2,6 +2,7 @@
 
 import { CourseData } from "@/app/data/api/course_data";
 import { FakeData } from "@/app/data/FakeData";
+import { classService } from "@/app/data/services/classService";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -11,12 +12,14 @@ interface BreadcrumbItem {
   href: string;
 }
 
+
 // Async resolvers for known segments
 async function resolveBreadcrumb(segment: string, id: string): Promise<string> {
+
   switch (segment) {
     case "course": {
-      const courses = CourseData.getCourses();
-      const course = courses.find((item) => String(item.id) === id);
+      const courses = await classService.getClasses();
+      const course = courses.find((item: any) => String(item.id) === id);
       return course?.name ?? id;
     }
     case "lesson": {

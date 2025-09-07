@@ -14,39 +14,39 @@ import { GraduationCap, Users, BookOpen, Clock, MapPin } from "lucide-react";
 import { FakeData } from "@/app/data/FakeData";
 import ClassScoreTable from "../course/[courseId]/ClassScoreTable";
 import { CourseData } from "@/app/data/api/course_data";
+import { Course } from "@/app/data/model/ExaminationModel";
 
-export default function TeacherScorePage() {
-  // Get all courses from FakeData
-  const allCourses = useMemo(() => CourseData.getCourses(), []);
+interface TeacherScorePageProps {
+  courses: Course[];
+}
 
+export default function TeacherScorePage({ courses }: TeacherScorePageProps) {
   const [selectedCourseId, setSelectedCourseId] = useState<string>("all");
 
   // Get unique course types for filtering
   const courseTypes = useMemo(() => {
-    const types = [...new Set(allCourses.map((course) => course.type))];
+    const types = [...new Set(courses.map((course) => course.type))];
     return types;
-  }, [allCourses]);
+  }, [courses]);
 
   // Filter courses by selected type
   const filteredCourses = useMemo(() => {
     if (selectedCourseId === "all") {
-      return allCourses;
+      return courses;
     }
-    return allCourses.filter(
-      (course) => course.id === parseInt(selectedCourseId)
-    );
-  }, [allCourses, selectedCourseId]);
+    return courses.filter((course) => course.id === parseInt(selectedCourseId));
+  }, [courses, selectedCourseId]);
 
   // Get course options for dropdown
   const courseOptions = useMemo(() => {
     return [
       { value: "all", label: "All Courses" },
-      ...allCourses.map((course) => ({
+      ...courses.map((course) => ({
         value: course.id.toString(),
-        label: `${course.code} - ${course.name}`,
+        label: `${course.name}`,
       })),
     ];
-  }, [allCourses]);
+  }, [courses]);
 
   // Get course type options for filtering
   const courseTypeOptions = useMemo(() => {
@@ -134,7 +134,7 @@ export default function TeacherScorePage() {
                 <div className='flex-1'>
                   <div className='flex items-center gap-3 mb-2'>
                     <span className='inline-flex items-center px-3 py-1 text-xs font-semibold bg-primary/10 text-primary rounded-full border border-primary/20'>
-                      {course.code}
+                      {course.name}
                     </span>
                     <Badge
                       variant={
@@ -190,10 +190,7 @@ export default function TeacherScorePage() {
           <div className='flex items-center justify-between'>
             <h2 className='text-2xl font-semibold'>
               Student Scores -{" "}
-              {
-                allCourses.find((c) => c.id === parseInt(selectedCourseId))
-                  ?.code
-              }
+              {courses.find((c) => c.id === parseInt(selectedCourseId))?.name}
             </h2>
             <Button variant='ghost' onClick={() => setSelectedCourseId("all")}>
               Back to All Courses

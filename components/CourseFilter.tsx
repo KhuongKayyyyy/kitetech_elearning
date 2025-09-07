@@ -10,12 +10,7 @@ import {
   Globe,
 } from "lucide-react";
 
-const SEMESTERS = [
-  "HK1 2023-2024",
-  "HK2 2023-2024",
-  "HK1 2024-2045",
-  "HK2 2024-2045",
-];
+const SEMESTERS = ["HK1 2025-2026", "HK2 2025-2026", "HK3 2025-2026"];
 
 const COURSE_TYPES = [
   {

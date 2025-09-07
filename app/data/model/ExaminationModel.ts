@@ -1,3 +1,17 @@
+export interface Course {
+  id: number;
+  name: string;
+  description: string;
+  instructor: string;
+  credits: number;
+  section: number;
+  schedule: string;
+  location: string;
+  enrolled: number;
+  rating: number;
+  type: string;
+  semester: string;
+}
 
 export interface ExaminationModel {
   id: number;
@@ -14,74 +28,139 @@ export const MockExaminationData: ExaminationModel[] = [
   {
     id: 1,
     name: "Midterm Examination",
-    description: "Comprehensive midterm exam covering chapters 1-6",
-    date: "2024-03-15",
+    description: "Midterm exam covering programming fundamentals and C language basics",
+    date: "2025-11-15",
     time: "09:00",
-    location: "Room A101",
-    duration: 120,
+    location: "C101",
+    duration: 90,
     class: {
       id: 1,
-      code: "CS101",
-      name: "Introduction to Computer Science",
-      instructor: "Dr. Smith",
+      name: "Introduction to Programming",
+      description: "Fundamentals of programming using C language.",
+      instructor: "Mrs Trần Thị Ngọc",
       credits: 3,
-      section: 1,
-      schedule: "MWF 10:00-11:00",
-      location: "Room B205",
-      enrolled: 45,
-      rating: 4.5,
-      description: "Fundamentals of computer science and programming",
-      type: "Core",
-      semester: "Fall 2024"
+      section: 2,
+      schedule: "Wednesday",
+      location: "C101",
+      enrolled: 97,
+      rating: 4.8,
+      type: "elective",
+      semester: "HK1 2025-2026"
     }
   },
   {
     id: 2,
     name: "Final Examination",
-    description: "Comprehensive final exam covering all course material",
-    date: "2024-05-10",
+    description: "Comprehensive final exam covering all data structures and algorithms",
+    date: "2025-12-20",
     time: "14:00",
-    location: "Room C301",
-    duration: 180,
+    location: "B202",
+    duration: 120,
     class: {
       id: 2,
-      code: "MATH201",
-      name: "Calculus II",
-      instructor: "Prof. Johnson",
+      name: "Data Structures and Algorithms",
+      description: "Study of data organization and algorithm design.",
+      instructor: "Mrs Trần Thị Ngọc",
       credits: 4,
-      section: 2,
-      schedule: "TTh 11:00-12:30",
-      location: "Room D102",
-      enrolled: 38,
-      rating: 4.2,
-      description: "Advanced calculus including integration techniques",
-      type: "Core",
-      semester: "Spring 2024"
+      section: 4,
+      schedule: "Saturday",
+      location: "B202",
+      enrolled: 167,
+      rating: 3.6,
+      type: "required",
+      semester: "HK1 2025-2026"
     }
   },
   {
     id: 3,
-    name: "Quiz 1",
-    description: "Short quiz on basic algorithms",
-    date: "2024-02-20",
+    name: "Midterm Examination",
+    description: "Database design, SQL queries, and normalization concepts",
+    date: "2025-11-18",
     time: "10:00",
-    location: "Room B205",
-    duration: 30,
+    location: "A201",
+    duration: 90,
     class: {
       id: 3,
-      code: "CS201",
-      name: "Data Structures and Algorithms",
-      instructor: "Dr. Davis",
+      name: "Database Systems",
+      description: "Relational databases, SQL, and normalization.",
+      instructor: "Mrs Trần Thị Ngọc",
       credits: 3,
       section: 1,
-      schedule: "MWF 13:00-14:00",
-      location: "Room B205",
-      enrolled: 42,
-      rating: 4.7,
-      description: "Study of fundamental data structures and algorithms",
-      type: "Core",
-      semester: "Spring 2024"
+      schedule: "Wednesday",
+      location: "A201",
+      enrolled: 237,
+      rating: 4,
+      type: "main",
+      semester: "HK1 2025-2026"
+    }
+  },
+  {
+    id: 4,
+    name: "Final Examination",
+    description: "OS principles, process management, and memory allocation",
+    date: "2025-12-22",
+    time: "08:00",
+    location: "C101",
+    duration: 120,
+    class: {
+      id: 4,
+      name: "Operating Systems",
+      description: "Principles of OS, processes, and memory management.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 1,
+      schedule: "Saturday",
+      location: "C101",
+      enrolled: 56,
+      rating: 4.4,
+      type: "elective",
+      semester: "HK1 2025-2026"
+    }
+  },
+  {
+    id: 5,
+    name: "Quiz",
+    description: "Quiz on networking protocols and TCP/IP fundamentals",
+    date: "2025-10-25",
+    time: "13:00",
+    location: "B202",
+    duration: 45,
+    class: {
+      id: 5,
+      name: "Computer Networks",
+      description: "Networking models, TCP/IP, routing and switching.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 5,
+      schedule: "Wednesday",
+      location: "B202",
+      enrolled: 126,
+      rating: 4.8,
+      type: "required",
+      semester: "HK1 2025-2026"
+    }
+  },
+  {
+    id: 6,
+    name: "Final Examination",
+    description: "Comprehensive networking exam covering all course topics",
+    date: "2025-12-18",
+    time: "15:00",
+    location: "B202",
+    duration: 120,
+    class: {
+      id: 5,
+      name: "Computer Networks",
+      description: "Networking models, TCP/IP, routing and switching.",
+      instructor: "Mrs Trần Thị Ngọc",
+      credits: 3,
+      section: 5,
+      schedule: "Wednesday",
+      location: "B202",
+      enrolled: 126,
+      rating: 4.8,
+      type: "required",
+      semester: "HK1 2025-2026"
     }
   }
 ];
-
