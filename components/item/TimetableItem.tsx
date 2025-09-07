@@ -10,6 +10,7 @@ interface TimetableItemProps {
   week?: string;
   group?: string;
   isBreakTime?: boolean;
+  color?: string;
 }
 
 export default function TimetableItem({
@@ -20,6 +21,7 @@ export default function TimetableItem({
   week = "-234--7890-23456-890",
   group = "5",
   isBreakTime = false,
+  color = "#8B966D",
 }: TimetableItemProps) {
   if (isBreakTime) {
     return (
@@ -36,8 +38,8 @@ export default function TimetableItem({
       onClick={() => {
         router.push(`/course/${courseCode}`);
       }}
-      className=' bg-olive-500 text-white p-2 rounded-lg shadow-sm h-32 flex flex-col justify-between text-xs leading-tight hover:shadow-lg hover:scale-105 hover:brightness-110 transition-all duration-200 cursor-pointer'
-      style={{ backgroundColor: "#8B966D" }}>
+      className='text-white p-2 rounded-lg shadow-sm h-32 flex flex-col justify-between text-xs leading-tight hover:shadow-lg hover:scale-105 hover:brightness-110 transition-all duration-200 cursor-pointer'
+      style={{ backgroundColor: color }}>
       <div className='space-y-1'>
         <div className='font-extrabold text-center'>{className}</div>
         <div className='font-semibold text-center'>
