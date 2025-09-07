@@ -43,6 +43,8 @@ export const API_CONFIG = {
     ADD_REGISTERED_COURSE: "/api/course-registrations",
     UPDATE_REGISTERED_COURSE: (id: string) => `/api/course-registrations/${id}`,
     DELETE_REGISTERED_COURSE: (id: string) => `/api/course-registrations/${id}`,
+    GET_AVAILABLE_COURSES: "/api/student-course-registration/available-subjects",
+    REGISTER_COURSE: "/api/student-course-registration/register",
 
     // semester
     GET_SEMESTERS: "/api/semesters",

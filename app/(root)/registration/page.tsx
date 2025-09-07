@@ -3,10 +3,8 @@ import React, { useMemo, useState, useEffect } from "react";
 import RegisSubjectTable from "@/components/item_list/RegisSubjectTable";
 import FloatingRegisedSubject from "@/components/item_list/FloatingRegisedSubject";
 import RegistedSubjectTable from "@/components/item_list/RegistedSubjectTable";
-import { FakeData } from "@/app/data/FakeData";
 import { Toaster } from "sonner";
 import { BookOpen, GraduationCap, Plus, List } from "lucide-react";
-import { CourseData } from "@/app/data/api/course_data";
 import {
   Dialog,
   DialogContent,
@@ -20,11 +18,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { courseRegisService } from "@/app/data/services/courseRegisService";
 import { CourseRegistrationSubject } from "@/app/data/model/courseRegisModel";
+import { AvailableCourse } from "@/app/data/model/availableCourse";
 import { semesterService } from "@/app/data/services/semesterService";
 import { SemesterModel } from "@/app/data/model/SemesterModel";
 
 export default function Page() {
-  const availableSubjects = CourseData.getCourses();
+  const [availableSubjects, setAvailableSubjects] = useState<AvailableCourse[]>(
+    []
+  );
   const [selectedSubjects, setSelectedSubjects] = useState<Set<string>>(
     new Set()
   );
@@ -41,8 +42,29 @@ export default function Page() {
   >([]);
   const [isLoadingRegisteredCourses, setIsLoadingRegisteredCourses] =
     useState(false);
+  const [isLoadingAvailableCourses, setIsLoadingAvailableCourses] =
+    useState(false);
   const [semesters, setSemesters] = useState<SemesterModel[]>([]);
   const [isLoadingSemesters, setIsLoadingSemesters] = useState(false);
+
+  // Fetch available courses when component mounts
+  useEffect(() => {
+    const fetchAvailableCourses = async () => {
+      setIsLoadingAvailableCourses(true);
+      try {
+        const courses = await courseRegisService.getAvailableCourses();
+        setAvailableSubjects(courses);
+        console.log("Fetched available courses:", courses);
+      } catch (error) {
+        console.error("Error fetching available courses:", error);
+        toast.error("Failed to fetch available courses");
+      } finally {
+        setIsLoadingAvailableCourses(false);
+      }
+    };
+
+    fetchAvailableCourses();
+  }, []);
 
   // Fetch semesters when component mounts
   useEffect(() => {
@@ -116,25 +138,112 @@ export default function Page() {
       toast.error("Please enter your password to confirm.");
       return;
     }
+
+    if (selectedSubjects.size === 0) {
+      toast.error("Please select at least one course to register.");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      await new Promise((r) => setTimeout(r, 800));
-      toast.success("Registration confirmed successfully.");
+
+      // Debug: Log what we're working with
+      console.log("Selected subjects:", Array.from(selectedSubjects));
+      console.log(
+        "Registered courses:",
+        registeredCourses.map((c) => ({
+          id: c.id,
+          subject_id: c.subject_id,
+          subject_name: c.subject?.name,
+        }))
+      );
+      console.log(
+        "Available subjects:",
+        availableSubjects.map((c) => ({
+          id: c.id,
+          subject_id: c.subject_id,
+          subject_name: c.subject?.name,
+        }))
+      );
+
+      // Get already registered course IDs - use AvailableCourse IDs directly
+      // Since the API expects AvailableCourse IDs, we need to find which available courses are already registered
+      const alreadyRegisteredAvailableCourseIds = availableSubjects
+        .filter((availableCourse) => availableCourse.isRegistered)
+        .map((availableCourse) => availableCourse.id);
+
+      console.log(
+        "Already registered AvailableCourse IDs:",
+        alreadyRegisteredAvailableCourseIds
+      );
+
+      // Convert selected subject IDs to numbers (these are AvailableCourse IDs)
+      const selectedCourseIds = Array.from(selectedSubjects).map((id) =>
+        parseInt(id)
+      );
+
+      // Combine already registered available course IDs with newly selected course IDs
+      const allCourseIds = [
+        ...alreadyRegisteredAvailableCourseIds,
+        ...selectedCourseIds,
+      ];
+
+      // Validate that all IDs are valid numbers
+      const validCourseIds = allCourseIds.filter((id) => !isNaN(id) && id > 0);
+
+      if (validCourseIds.length !== allCourseIds.length) {
+        console.error("Invalid course IDs detected:", {
+          original: allCourseIds,
+          valid: validCourseIds,
+          invalid: allCourseIds.filter((id) => isNaN(id) || id <= 0),
+        });
+        toast.error("Some course IDs are invalid. Please try again.");
+        return;
+      }
+
+      console.log(
+        "Already registered courses (CourseRegistrationSubject):",
+        registeredCourses.map((c) => ({
+          id: c.id,
+          subject_id: c.subject_id,
+          subject_name: c.subject?.name,
+        }))
+      );
+      console.log(
+        "Already registered AvailableCourse IDs:",
+        alreadyRegisteredAvailableCourseIds
+      );
+      console.log("Newly selected AvailableCourse IDs:", selectedCourseIds);
+      console.log("Sending complete list to API:", validCourseIds);
+      console.log("Validated course IDs:", validCourseIds);
+
+      // Call the registration API with the complete list of courses
+      await courseRegisService.registerCourse(validCourseIds);
+
+      toast.success("Registration confirmed successfully!");
       setShowPasswordDialog(false);
       setPassword("");
-      // Persist selected subjects into confirmed list (unique by id)
-      const toConfirm = Array.from(selectedSubjects)
-        .map((id) =>
-          availableSubjects.find((subj) => subj.id.toString() === id)
-        )
-        .filter(Boolean) as any[];
-      setConfirmedSubjects((prev) => {
-        const existing = new Map(prev.map((c: any) => [c.id, c]));
-        toConfirm.forEach((c) => existing.set(c.id, c));
-        return Array.from(existing.values());
-      });
+
+      // Clear selected subjects
       setSelectedSubjects(new Set());
+
+      // Refresh both available courses and registered courses from API
+      const [updatedAvailableCourses, updatedRegisteredCourses] =
+        await Promise.all([
+          courseRegisService.getAvailableCourses(),
+          selectedSemester
+            ? courseRegisService.getRegisteredCourses(selectedSemester)
+            : Promise.resolve([]),
+        ]);
+
+      setAvailableSubjects(updatedAvailableCourses);
+      setRegisteredCourses(updatedRegisteredCourses);
+
+      // Switch to registered tab to show the results
       setActiveTab("registered");
+    } catch (error) {
+      console.error("Registration error:", error);
+      toast.error("Failed to register for courses. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -199,18 +308,28 @@ export default function Page() {
                   </div>
                 </div>
 
-                <RegisSubjectTable
-                  availableSubjects={registrableSubjects}
-                  selectedSubjects={selectedSubjects}
-                  setSelectedSubjects={setSelectedSubjects}
-                  onConfirm={handleConfirm}
-                />
+                {isLoadingAvailableCourses ? (
+                  <div className='flex justify-center items-center py-8'>
+                    <div className='text-gray-600'>
+                      Loading available courses...
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <RegisSubjectTable
+                      availableSubjects={registrableSubjects}
+                      selectedSubjects={selectedSubjects}
+                      setSelectedSubjects={setSelectedSubjects}
+                      onConfirm={handleConfirm}
+                    />
 
-                <FloatingRegisedSubject
-                  registeredSubjects={registeredSubjects}
-                  onClear={handleClear}
-                  onConfirm={handleConfirm}
-                />
+                    <FloatingRegisedSubject
+                      registeredSubjects={registeredSubjects}
+                      onClear={handleClear}
+                      onConfirm={handleConfirm}
+                    />
+                  </>
+                )}
               </div>
             )}
 
@@ -277,17 +396,54 @@ export default function Page() {
         </div>
       </div>
 
-      <Toaster position='bottom-left'></Toaster>
-
       <Dialog open={showPasswordDialog} onOpenChange={setShowPasswordDialog}>
-        <DialogContent className='sm:max-w-[425px]'>
+        <DialogContent className='sm:max-w-[500px]'>
           <DialogHeader>
-            <DialogTitle>Confirm Registration</DialogTitle>
+            <DialogTitle>Confirm Course Registration</DialogTitle>
             <DialogDescription>
-              Enter your password to confirm registering selected subjects.
+              Please review your selected courses and enter your password to
+              confirm registration.
             </DialogDescription>
           </DialogHeader>
           <div className='grid gap-4 py-4'>
+            {/* Selected Courses Summary */}
+            <div className='bg-gray-50 p-4 rounded-lg'>
+              <h4 className='font-medium text-gray-900 mb-2'>
+                Selected Courses:
+              </h4>
+              <div className='space-y-1'>
+                {Array.from(selectedSubjects).map((id) => {
+                  const course = availableSubjects.find(
+                    (c) => c.id.toString() === id
+                  );
+                  return course ? (
+                    <div key={id} className='flex justify-between text-sm'>
+                      <span className='text-gray-700'>
+                        {course.subject?.name}
+                      </span>
+                      <span className='text-gray-500'>
+                        {course.subject?.credits} TC
+                      </span>
+                    </div>
+                  ) : null;
+                })}
+              </div>
+              <div className='mt-2 pt-2 border-t border-gray-200'>
+                <div className='flex justify-between text-sm font-medium'>
+                  <span>Total Credits:</span>
+                  <span>
+                    {Array.from(selectedSubjects).reduce((total, id) => {
+                      const course = availableSubjects.find(
+                        (c) => c.id.toString() === id
+                      );
+                      return total + (course?.subject?.credits || 0);
+                    }, 0)}{" "}
+                    TC
+                  </span>
+                </div>
+              </div>
+            </div>
+
             <div className='grid gap-2'>
               <label htmlFor='password' className='text-sm font-medium'>
                 Password
@@ -298,6 +454,7 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder='Your account password'
+                disabled={isSubmitting}
               />
             </div>
           </div>
@@ -309,7 +466,11 @@ export default function Page() {
               Cancel
             </Button>
             <Button onClick={handleSubmitRegistration} disabled={isSubmitting}>
-              {isSubmitting ? "Confirming..." : "Confirm"}
+              {isSubmitting
+                ? "Registering..."
+                : `Register ${selectedSubjects.size} Course${
+                    selectedSubjects.size !== 1 ? "s" : ""
+                  }`}
             </Button>
           </DialogFooter>
         </DialogContent>

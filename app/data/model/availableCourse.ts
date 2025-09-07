@@ -6,14 +6,7 @@ export interface CourseRegistrationSchedule {
 
 export interface Semester {
   id: number;
-  academic_year_id: number;
   name: string;
-  start_date: string;
-  end_date: string;
-  status: string;
-  description: string;
-  created_at: string;
-  updated_at: string;
 }
 
 export interface CourseRegistration {
@@ -32,7 +25,7 @@ export interface Subject {
   description: string;
 }
 
-export interface CourseRegistrationSubject {
+export interface AvailableCourse {
   id: number;
   subject_id: number;
   start_date: string;
