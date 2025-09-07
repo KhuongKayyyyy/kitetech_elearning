@@ -116,15 +116,34 @@ export default function AddMaterialItem({
     if (!title.trim()) return;
     if (materialType === ClassAssignmentEnum.LINK && !link.trim()) return;
 
+    const formatToDDMMYYYY = (value: string) => {
+      // Expecting input like YYYY-MM-DD from <input type="date">
+      const m = value.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (m) {
+        return `${m[3]}/${m[2]}/${m[1]}`;
+      }
+      // If already DD/MM/YYYY, return as-is
+      const dmy = value.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (dmy) return value;
+      // Fallback: try Date parse and format
+      const d = new Date(value);
+      if (!isNaN(d.getTime())) {
+        const dd = String(d.getDate()).padStart(2, "0");
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+      }
+      return value;
+    };
+
+    const formattedDeadline = deadline ? formatToDDMMYYYY(deadline) : undefined;
+
     onSave({
       title: title.trim(),
       description: description.trim() || undefined,
       file: selectedFile || undefined,
       link: materialType === ClassAssignmentEnum.LINK ? link.trim() : undefined,
-      deadline:
-        materialType === ClassAssignmentEnum.SUBMISSION && deadline
-          ? deadline
-          : undefined,
+      deadline: formattedDeadline,
       type: materialType,
       classSectionId: classSectionId,
     });
@@ -260,8 +279,9 @@ export default function AddMaterialItem({
             </div>
           )}
 
-          {/* Deadline Input - Only for submission type */}
-          {materialType === ClassAssignmentEnum.SUBMISSION && (
+          {/* Deadline Input - Show for submission and announcement types */}
+          {(materialType === ClassAssignmentEnum.SUBMISSION ||
+            materialType === ClassAssignmentEnum.ANNOUNCEMENT) && (
             <div className='space-y-2'>
               <Label htmlFor='deadline' className='text-sm font-medium'>
                 Deadline
@@ -270,7 +290,7 @@ export default function AddMaterialItem({
                 <Calendar className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-neutral-400' />
                 <Input
                   id='deadline'
-                  type='datetime-local'
+                  type='date'
                   value={deadline}
                   onChange={(e) => setDeadline(e.target.value)}
                   className='w-full pl-10'
@@ -375,14 +395,10 @@ export default function AddMaterialItem({
             disabled={
               !title.trim() ||
               (materialType === ClassAssignmentEnum.LINK && !link.trim()) ||
-              (materialType === ClassAssignmentEnum.SUBMISSION &&
-                !deadline.trim()) ||
               (materialType === ClassAssignmentEnum.DOCUMENT &&
                 !selectedFile) ||
               (materialType === ClassAssignmentEnum.ANNOUNCEMENT &&
                 !description.trim()) ||
-              (materialType === ClassAssignmentEnum.SUBMISSION &&
-                !deadline.trim()) ||
               (materialType === ClassAssignmentEnum.DOCUMENT && !selectedFile)
             }>
             Add Material

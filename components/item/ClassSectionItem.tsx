@@ -324,6 +324,8 @@ export default function ClassSectionItem({
             title: materialData.title,
             description: materialData.description,
             file: materialData.file,
+            link: materialData.link,
+            deadline: materialData.deadline,
             type: materialData.type,
           });
           // if (materialData.description && materialData.type) {

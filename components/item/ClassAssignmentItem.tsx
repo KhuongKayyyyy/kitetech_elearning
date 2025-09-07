@@ -39,7 +39,13 @@ export default function ClassAssignmentItem({
   description,
 }: ClassAssignmentItemProps) {
   const formatDueDate = (date: string) => {
-    const dueDateTime = new Date(date);
+    // date may be DD/MM/YYYY
+    let dueDateTime = new Date(date);
+    const ddmmyyyy = date.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (ddmmyyyy) {
+      const [, dd, mm, yyyy] = ddmmyyyy;
+      dueDateTime = new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+    }
     const now = new Date();
     const diffTime = dueDateTime.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -116,11 +122,7 @@ export default function ClassAssignmentItem({
               Due Date:
             </span>
             <span className='font-medium text-neutral-900 dark:text-neutral-100 ml-auto group-hover:text-neutral-800 dark:group-hover:text-neutral-50 transition-colors duration-300'>
-              {new Date(dueDate).toLocaleDateString("en-US", {
-                weekday: "short",
-                month: "short",
-                day: "numeric",
-              })}
+              {dueDate}
             </span>
           </div>
           <div className='flex items-center gap-2 text-xs sm:text-sm'>

@@ -1,7 +1,8 @@
 "use client";
 import ClassAssignmentItem from "@/components/item/ClassAssignmentItem";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BookOpen, Calendar, Clock, Filter } from "lucide-react";
+import { classSectionMaterialService } from "@/app/data/services/classSectionMaterialService";
 
 // Dummy class list for dropdown, with "All Class" option
 const classOptions = [
@@ -19,26 +20,94 @@ export default function Page() {
   // State for selected class, default to "All Class"
   const [selectedClassId, setSelectedClassId] = useState<number>(0);
 
+  const [isLoading, setIsLoading] = useState(false);
+  const [submissions, setSubmissions] = useState<any[]>([]);
+
+  const parseDDMMYYYY = (dateStr?: string) => {
+    if (!dateStr) return undefined;
+    const m = dateStr.match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+    if (!m) return undefined;
+    const [, dd, mm, yyyy] = m;
+    return new Date(Number(yyyy), Number(mm) - 1, Number(dd));
+  };
+
+  const isPastDate = (dateStr?: string) => {
+    const d = parseDDMMYYYY(dateStr);
+    if (!d) return false;
+    const today = new Date();
+    // Zero out time for both dates
+    const base = new Date(
+      today.getFullYear(),
+      today.getMonth(),
+      today.getDate()
+    );
+    const cmp = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    return cmp.getTime() < base.getTime();
+  };
+
+  const assignedSubmissions = submissions.filter(
+    (s) => !isPastDate(s.deadline)
+  );
+  const missingSubmissions = submissions.filter((s) => isPastDate(s.deadline));
+
+  useEffect(() => {
+    const loadPosts = async () => {
+      try {
+        setIsLoading(true);
+        const classroomId =
+          selectedClassId === 0 ? "1" : String(selectedClassId);
+        const posts =
+          await classSectionMaterialService.getClassSectionMaterials(
+            classroomId
+          );
+        const onlySubmissions = (posts || []).filter(
+          (p: any) => p?.type === "submission"
+        );
+        setSubmissions(onlySubmissions);
+      } catch (e) {
+        setSubmissions([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadPosts();
+  }, [selectedClassId]);
+
   const renderTabContent = () => {
     switch (activeTab) {
       case "assigned":
         return (
           <div className='w-full flex-1 p-6'>
             <div className='space-y-4'>
-              {/* Empty state */}
-              <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
-                <div className='w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-3'>
-                  <BookOpen className='w-6 h-6 text-blue-500' />
+              {isLoading ? (
+                <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
+                  <div className='w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg animate-pulse mx-auto mb-3' />
+                  <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
+                    Loading assignments…
+                  </p>
                 </div>
-                <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
-                  No assigned assignments
-                </p>
-              </div>
-              <ClassAssignmentItem
-                title='Assignment 1'
-                dueDate='2023-01-01'
-                status='assigned'
-              />
+              ) : assignedSubmissions.length === 0 ? (
+                <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
+                  <div className='w-12 h-12 bg-blue-50 dark:bg-blue-900/20 rounded-lg flex items-center justify-center mx-auto mb-3'>
+                    <BookOpen className='w-6 h-6 text-blue-500' />
+                  </div>
+                  <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
+                    No assigned assignments
+                  </p>
+                </div>
+              ) : (
+                <div className='flex flex-wrap gap-4'>
+                  {assignedSubmissions.map((item) => (
+                    <ClassAssignmentItem
+                      key={item.id}
+                      title={item.material}
+                      dueDate={item.deadline || undefined}
+                      description={item.content || undefined}
+                      status={"assigned"}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );
@@ -46,20 +115,35 @@ export default function Page() {
         return (
           <div className='w-full flex-1 p-6'>
             <div className='space-y-4'>
-              {/* Empty state */}
-              <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
-                <div className='w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center mx-auto mb-3'>
-                  <Clock className='w-6 h-6 text-red-500' />
+              {isLoading ? (
+                <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
+                  <div className='w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-lg animate-pulse mx-auto mb-3' />
+                  <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
+                    Loading…
+                  </p>
                 </div>
-                <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
-                  No missing assignments
-                </p>
-              </div>
-              <ClassAssignmentItem
-                title='Assignment 1'
-                dueDate='2023-01-01'
-                status='missing'
-              />
+              ) : missingSubmissions.length === 0 ? (
+                <div className='bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 text-center'>
+                  <div className='w-12 h-12 bg-red-50 dark:bg-red-900/20 rounded-lg flex items-center justify-center mx-auto mb-3'>
+                    <Clock className='w-6 h-6 text-red-500' />
+                  </div>
+                  <p className='text-neutral-600 dark:text-neutral-400 text-sm'>
+                    No missing assignments
+                  </p>
+                </div>
+              ) : (
+                <div className='flex flex-wrap gap-4'>
+                  {missingSubmissions.map((item) => (
+                    <ClassAssignmentItem
+                      key={item.id}
+                      title={item.material}
+                      dueDate={item.deadline || undefined}
+                      description={item.content || undefined}
+                      status={"missing"}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );

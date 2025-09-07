@@ -21,6 +21,17 @@ export default function CourseSectionMap({
     }
   };
 
+  const formatSectionLabel = (section: ClassSectionModel) => {
+    if (typeof (section as any).section === "number") {
+      return `S-${(section as any).section}`;
+    }
+    if ((section as any).name) {
+      const match = String((section as any).name).match(/\d+/);
+      return match ? `S-${match[0]}` : String((section as any).name);
+    }
+    return "S-?";
+  };
+
   return (
     <div className='bg-white dark:bg-neutral-800 rounded-lg border border-neutral-200 dark:border-neutral-700 p-4 sm:p-6 shadow-sm'>
       <h3 className='text-base sm:text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-3 sm:mb-4'>
@@ -36,14 +47,8 @@ export default function CourseSectionMap({
               border-neutral-200 dark:border-neutral-600 hover:border-primary hover:bg-primary/5
               hover:shadow-md focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-1
             `}>
-            <div className='text-xs sm:text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-1'>
-              Section
-            </div>
-            <div className='text-base sm:text-lg font-bold text-neutral-900 dark:text-neutral-100'>
-              {section.section}
-            </div>
-            <div className='text-xs text-neutral-500 dark:text-neutral-400 truncate px-1'>
-              {section.name}
+            <div className='text-sm sm:text-base font-semibold text-neutral-900 dark:text-neutral-100 truncate px-1'>
+              {formatSectionLabel(section)}
             </div>
           </button>
         ))}

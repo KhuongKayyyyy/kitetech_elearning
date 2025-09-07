@@ -181,7 +181,7 @@ export default function ClassSectionMaterialItem({
             )}
             {material.deadline && (
               <span className='text-xs text-red-500 dark:text-red-400'>
-                Due: {new Date(material.deadline).toLocaleDateString()}
+                Due: {material.deadline}
               </span>
             )}
           </div>

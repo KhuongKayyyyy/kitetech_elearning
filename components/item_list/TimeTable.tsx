@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import TimetableItem from "@/components/item/TimetableItem";
 import { classService } from "@/app/data/services/classService";
+import { FakeData } from "@/app/data/FakeData";
+import { UserRole } from "@/app/data/enum/UserRole";
 
 interface TimeTableProps {
   date?: Date;
@@ -156,6 +158,8 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
     return isActive;
   });
 
+  const userRole = FakeData.getCurrentUserRole();
+
   // Create schedule data mapping based on filtered courses
   const scheduleData: { [key: string]: any } = {};
 
@@ -163,7 +167,8 @@ export default function TimeTable({ date = new Date() }: TimeTableProps) {
     course.schedules.forEach((schedule) => {
       const key = `${schedule.schedule}-${schedule.sections}`;
       scheduleData[key] = {
-        className: course.name, // Use course name instead of subject name
+        className:
+          userRole === UserRole.STUDENT ? course.subject.name : course.name, // Use course name instead of subject name
         courseCode: course.id.toString(),
         room: course.location,
         period: getPeriodForSection(schedule.sections),

@@ -4,12 +4,10 @@ import { FakeData } from "@/app/data/FakeData";
 import CourseBriefInformation from "./CourseBriefInformation";
 import AddSectionButton from "./AddSectionButton";
 import ClassSectionList from "@/components/item_list/ClassSectionList";
-import CourseProcess from "@/components/item/CourseProcess";
 import CourseSectionMap from "@/components/item/CourseSectionMap";
 import CourseFileSection from "@/components/item_list/CourseFileSection";
 import PeopleInClassList from "@/components/item_list/PeopleInClassList";
 import ClassworkList from "@/components/item_list/ClassworkList";
-import ClassMeetSection from "@/components/item/ClassMeetSection";
 import { toast, Toaster } from "sonner";
 import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
 import ClassScoreTable from "./ClassScoreTable";
@@ -288,11 +286,9 @@ export default function Page({ params }: CoursePageProps) {
               <SidebarSkeleton />
             ) : (
               <>
-                <ClassMeetSection />
-                <CourseProcess />
                 <CourseSectionMap
-                  classSession={classSections}
-                  currentSectionId={classSections[0]?.id}
+                  classSession={classSectionWithMaterials as any}
+                  currentSectionId={(classSectionWithMaterials as any)[0]?.id}
                 />
                 <CourseFileSection
                   classSectionId={classSections[0]?.id.toString()}
@@ -369,13 +365,9 @@ export default function Page({ params }: CoursePageProps) {
             <SidebarSkeleton />
           ) : (
             <>
-              <ClassMeetSection />
-              <div className='mt-6'></div>
-              <CourseProcess />
-              <div className='mt-6'></div>
               <CourseSectionMap
-                classSession={classSections}
-                currentSectionId={classSections[0]?.id}
+                classSession={classSectionWithMaterials as any}
+                currentSectionId={(classSectionWithMaterials as any)[0]?.id}
               />
               <div className='mt-6'></div>
               <CourseFileSection
