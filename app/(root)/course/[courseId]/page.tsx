@@ -14,6 +14,7 @@ import { toast, Toaster } from "sonner";
 import { CourseTabEnum } from "@/app/data/enum/CourseTabEnum";
 import ClassScoreTable from "./ClassScoreTable";
 import { classSessionService } from "@/app/data/services/classSessionService";
+import { classService } from "@/app/data/services/classService";
 import { useAuthentication } from "@/hooks/useAuthentication";
 import { UserRole } from "@/app/data/enum/UserRole";
 import { classSectionMaterialService } from "@/app/data/services/classSectionMaterialService";
@@ -112,15 +113,44 @@ export default function Page({ params }: CoursePageProps) {
   const [classSectionWithMaterials, setClassSectionWithMaterials] = useState(
     []
   );
+  const [courseDetails, setCourseDetails] = useState<any>(null);
 
   useEffect(() => {
     const fetchClassSectionWithMaterials = async () => {
       try {
-        const data = await classSessionService.getClassDetail(
+        // Get class section materials from the existing API
+        const materialsData = await classSessionService.getClassDetail(
           actualParams.courseId
         );
-        console.log("Class section with materials:", data);
-        setClassSectionWithMaterials(data);
+        console.log("Class section with materials:", materialsData);
+        setClassSectionWithMaterials(materialsData);
+
+        // Get course details from my-classrooms API for allow_grade_editing
+        const myClassroomsData = await classService.getClasses();
+        console.log("My classrooms data:", myClassroomsData);
+
+        // Find the course that matches the current courseId
+        if (myClassroomsData && myClassroomsData.length > 0) {
+          const currentCourse = myClassroomsData.find(
+            (course: any) => course.id.toString() === actualParams.courseId
+          );
+          if (currentCourse) {
+            setCourseDetails(currentCourse);
+            console.log("Updated course details:", currentCourse);
+            console.log(
+              "allow_grade_editing:",
+              currentCourse.allow_grade_editing
+            );
+            console.log("courseId:", actualParams.courseId);
+          } else {
+            console.warn(
+              "Course not found in my-classrooms API response:",
+              actualParams.courseId
+            );
+            // Fallback to first item if course not found
+            setCourseDetails(myClassroomsData[0]);
+          }
+        }
       } catch (error) {
         console.error("Failed to fetch class section details:", error);
       }
@@ -157,6 +187,37 @@ export default function Page({ params }: CoursePageProps) {
     setNewSectionName("");
   };
 
+  const refreshCourseDetails = async () => {
+    try {
+      // Get course details from my-classrooms API for allow_grade_editing
+      const myClassroomsData = await classService.getClasses();
+      console.log("Refreshed my classrooms data:", myClassroomsData);
+
+      if (myClassroomsData && myClassroomsData.length > 0) {
+        const currentCourse = myClassroomsData.find(
+          (course: any) => course.id.toString() === actualParams.courseId
+        );
+        if (currentCourse) {
+          setCourseDetails(currentCourse);
+          console.log("Refreshed course details:", currentCourse);
+          console.log(
+            "allow_grade_editing:",
+            currentCourse.allow_grade_editing
+          );
+          console.log("courseId:", actualParams.courseId);
+        } else {
+          console.warn(
+            "Course not found in my-classrooms API response during refresh:",
+            actualParams.courseId
+          );
+          setCourseDetails(myClassroomsData[0]);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to refresh course details:", error);
+    }
+  };
+
   if (!course && !isLoading) {
     return <div className='p-4 text-center'>Course not found</div>;
   }
@@ -184,7 +245,13 @@ export default function Page({ params }: CoursePageProps) {
       case "people":
         return <PeopleInClassList courseId={course.id} />;
       case "score":
-        return <ClassScoreTable courseId={course.id} />;
+        return (
+          <ClassScoreTable
+            courseId={course.id}
+            allowGradeEditing={courseDetails?.allow_grade_editing || false}
+            onRefreshCourseDetails={refreshCourseDetails}
+          />
+        );
       default:
         return null;
     }

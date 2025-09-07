@@ -61,6 +61,7 @@ import {
   ChevronUp,
   Columns3,
   Edit,
+  RefreshCw,
   Search,
 } from "lucide-react";
 import { classService } from "@/app/data/services/classService";
@@ -123,9 +124,15 @@ const ScoreCell = ({ value }: { value: number | null }) => {
 
 interface ClassScoreTableProps {
   courseId: number;
+  allowGradeEditing?: boolean;
+  onRefreshCourseDetails?: () => Promise<void>;
 }
 
-export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
+export default function ClassScoreTable({
+  courseId,
+  allowGradeEditing = false,
+  onRefreshCourseDetails,
+}: ClassScoreTableProps) {
   const [isLoading, setIsLoading] = useState(true);
   const [classGrades, setClassGrades] = useState<GradeData[]>([]);
 
@@ -335,7 +342,13 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
     {
       id: "actions",
       header: () => <span className='sr-only'>Actions</span>,
-      cell: ({ row }) => <RowActions row={row} onEdit={handleEditStudent} />,
+      cell: ({ row }) => (
+        <RowActions
+          row={row}
+          onEdit={handleEditStudent}
+          allowGradeEditing={allowGradeEditing}
+        />
+      ),
       size: 60,
       enableHiding: false,
     },
@@ -389,6 +402,34 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
 
   return (
     <div className='space-y-6'>
+      {/* Grade Editing Status */}
+      {!allowGradeEditing && (
+        <div className='bg-amber-50 border border-amber-200 rounded-lg p-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2'>
+              <div className='w-2 h-2 bg-amber-500 rounded-full'></div>
+              <span className='text-sm font-medium text-amber-800'>
+                Grade editing is currently disabled for this course
+              </span>
+            </div>
+            {onRefreshCourseDetails && (
+              <Button
+                variant='outline'
+                size='sm'
+                onClick={onRefreshCourseDetails}
+                className='gap-2 text-amber-700 border-amber-300 hover:bg-amber-100'>
+                <RefreshCw className='h-3 w-3' />
+                Refresh
+              </Button>
+            )}
+          </div>
+          <p className='text-xs text-amber-700 mt-1'>
+            Contact the administrator to enable grade editing, or click refresh
+            to check for updates
+          </p>
+        </div>
+      )}
+
       {/* Search and Filters */}
       <div className='flex flex-col gap-4'>
         <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
@@ -444,6 +485,17 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
                 onClick={clearAllFilters}
                 className='gap-2'>
                 Clear filters
+              </Button>
+            )}
+
+            {/* Refresh Course Details */}
+            {onRefreshCourseDetails && (
+              <Button
+                variant='outline'
+                onClick={onRefreshCourseDetails}
+                className='gap-2'>
+                <RefreshCw className='h-4 w-4' />
+                Refresh
               </Button>
             )}
           </div>
@@ -635,11 +687,21 @@ export default function ClassScoreTable({ courseId }: ClassScoreTableProps) {
 function RowActions({
   row,
   onEdit,
+  allowGradeEditing,
 }: {
   row: Row<StudentScore>;
   onEdit: (student: StudentScore) => void;
+  allowGradeEditing: boolean;
 }) {
   const studentScore = row.original;
+
+  if (!allowGradeEditing) {
+    return (
+      <div className='flex items-center justify-center h-8 w-8'>
+        <span className='text-xs text-muted-foreground'>Locked</span>
+      </div>
+    );
+  }
 
   return (
     <Button
