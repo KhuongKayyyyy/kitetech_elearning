@@ -133,8 +133,48 @@ export default function Page() {
     setShowPasswordDialog(true);
   };
 
+  const handleUnregister = async (courseId: string) => {
+    try {
+      // Get all currently registered courses (excluding the one being unregistered)
+      const remainingRegisteredCourseIds = availableSubjects
+        .filter(
+          (availableCourse) =>
+            availableCourse.isRegistered &&
+            availableCourse.id.toString() !== courseId
+        )
+        .map((availableCourse) => availableCourse.id);
+
+      console.log("Unregistering course ID:", courseId);
+      console.log(
+        "Remaining registered course IDs:",
+        remainingRegisteredCourseIds
+      );
+
+      // Call the registration API with only the remaining courses
+      await courseRegisService.registerCourse(remainingRegisteredCourseIds);
+
+      toast.success("Course unregistered successfully!");
+
+      // Refresh both available courses and registered courses from API
+      const [updatedAvailableCourses, updatedRegisteredCourses] =
+        await Promise.all([
+          courseRegisService.getAvailableCourses(),
+          selectedSemester
+            ? courseRegisService.getRegisteredCourses(selectedSemester)
+            : Promise.resolve([]),
+        ]);
+
+      setAvailableSubjects(updatedAvailableCourses);
+      setRegisteredCourses(updatedRegisteredCourses);
+    } catch (error) {
+      console.error("Unregistration error:", error);
+      toast.error("Failed to unregister course. Please try again.");
+    }
+  };
+
   const handleSubmitRegistration = async () => {
-    if (!password) {
+    // Check for null, undefined, or empty password
+    if (!password || password.trim() === "") {
       toast.error("Please enter your password to confirm.");
       return;
     }
@@ -146,6 +186,10 @@ export default function Page() {
 
     try {
       setIsSubmitting(true);
+
+      // Add fake waiting time to simulate processing
+      toast.info("Processing your registration...");
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // 2 second delay
 
       // Debug: Log what we're working with
       console.log("Selected subjects:", Array.from(selectedSubjects));
@@ -321,6 +365,7 @@ export default function Page() {
                       selectedSubjects={selectedSubjects}
                       setSelectedSubjects={setSelectedSubjects}
                       onConfirm={handleConfirm}
+                      onUnregister={handleUnregister}
                     />
 
                     <FloatingRegisedSubject

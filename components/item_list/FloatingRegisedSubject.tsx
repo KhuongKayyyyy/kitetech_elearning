@@ -1,26 +1,20 @@
 "use client";
 import React, { useState } from "react";
-
-// Mock data for demonstration
-const registeredSubjects = [
-  { id: 1, name: "Math 101", credits: 3 },
-  { id: 2, name: "Physics 201", credits: 4 },
-  { id: 3, name: "History 301", credits: 2 },
-];
+import { AvailableCourse } from "@/app/data/model/availableCourse";
 
 export default function FloatingRegisedSubject({
   registeredSubjects,
   onClear,
   onConfirm,
 }: {
-  registeredSubjects: any[];
+  registeredSubjects: AvailableCourse[];
   onClear?: () => void;
   onConfirm?: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const totalSubjects = registeredSubjects.length;
   const totalCredits = registeredSubjects.reduce(
-    (sum, subj) => sum + subj.credits,
+    (sum, subj) => sum + (subj.subject?.credits || 0),
     0
   );
 
@@ -61,20 +55,17 @@ export default function FloatingRegisedSubject({
       {isExpanded ? (
         <>
           <ul className='divide-y divide-white/20 dark:divide-white/10 mb-2'>
-            {registeredSubjects.map((subject) => (
+            {registeredSubjects.map((course) => (
               <li
-                key={subject.id}
+                key={course.id}
                 className='py-3 hover:bg-white/10 dark:hover:bg-white/5 rounded-lg px-2 -mx-2 transition-all duration-200'>
                 <div className='mb-2'>
                   <span className='font-medium text-gray-800 dark:text-gray-100 truncate drop-shadow-sm block'>
-                    {subject.name}
+                    {course.subject?.name || "Unknown Course"}
                   </span>
-                  <div className='flex items-center justify-between text-sm mt-1'>
-                    <span className='text-blue-700 dark:text-blue-300 font-semibold drop-shadow-sm'>
-                      {subject.courseCode || subject.id}
-                    </span>
+                  <div className='flex items-center justify-end text-sm mt-1'>
                     <span className='text-blue-700 dark:text-blue-300 font-semibold drop-shadow-sm bg-blue-100/30 dark:bg-blue-900/30 px-2 py-1 rounded-full'>
-                      {subject.credits} Credits
+                      {course.subject?.credits || 0} Credits
                     </span>
                   </div>
                 </div>

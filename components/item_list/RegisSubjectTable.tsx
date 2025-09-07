@@ -16,11 +16,13 @@ export default function RegisSubjectTable({
   selectedSubjects,
   setSelectedSubjects,
   onConfirm,
+  onUnregister,
 }: {
   availableSubjects: AvailableCourse[];
   selectedSubjects: Set<string>;
   setSelectedSubjects: (subjects: Set<string>) => void;
   onConfirm?: () => void;
+  onUnregister?: (courseId: string) => void;
 }) {
   const handleRegister = (courseId: string) => {
     const course = availableSubjects.find((c) => c.id.toString() === courseId);
@@ -53,6 +55,19 @@ export default function RegisSubjectTable({
       newSelected.add(courseId);
     }
     setSelectedSubjects(newSelected);
+  };
+
+  const handleUnregister = (courseId: string) => {
+    const course = availableSubjects.find((c) => c.id.toString() === courseId);
+
+    if (course && onUnregister) {
+      toast.success(
+        "Subject " +
+          (course?.subject?.name || "Unknown") +
+          " will be unregistered"
+      );
+      onUnregister(courseId);
+    }
   };
 
   const getEnrollmentStatus = (enrolled: number, capacity: number) => {
@@ -268,10 +283,14 @@ export default function RegisSubjectTable({
                           </td>
                           <td className='px-6 py-4 whitespace-nowrap'>
                             {isAlreadyRegistered ? (
-                              <div className='inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-green-100 text-green-800 border border-green-200'>
+                              <button
+                                onClick={() =>
+                                  handleUnregister(course.id.toString())
+                                }
+                                className='inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-red-100 text-red-800 border border-red-200 hover:bg-red-200 transition-all duration-200'>
                                 <Check className='w-4 h-4' />
-                                {course.registrationStatus || "Registered"}
-                              </div>
+                                Unregister
+                              </button>
                             ) : (
                               <button
                                 onClick={() =>
